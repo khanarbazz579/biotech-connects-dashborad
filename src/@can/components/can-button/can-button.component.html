@@ -1,0 +1,32 @@
+<span *ngIf="buttonConfig" [ngStyle]="{'float': buttonConfig.float? buttonConfig.float: 'right'}" class="button-container">
+
+    <ng-container *ngIf="buttonConfig.type === 'basic'">
+        <button mat-button *ngIf="buttonConfig.color === 'default'" [disabled]="disabled" (click)="click()"
+            type="button">{{buttonConfig.label}}</button>
+        <button mat-button *ngIf="buttonConfig.color !== 'default'" [disabled]="disabled" (click)="click()"
+            [color]="buttonConfig.color">{{buttonConfig.label}}</button>
+    </ng-container>
+
+    <ng-container *ngIf="buttonConfig.type === 'raised'">
+        <button mat-raised-button *ngIf="buttonConfig.color === 'default'" [disabled]="disabled" (click)="click()"
+            type="button">{{buttonConfig.label}}</button>
+        <button mat-raised-button *ngIf="buttonConfig.color !== 'default'" [disabled]="disabled" (click)="click()"
+            [color]="buttonConfig.color">{{buttonConfig.label}}</button>
+    </ng-container>
+
+    <ng-container *ngIf="buttonConfig.type === 'stroked'">
+        <button mat-stroked-button *ngIf="buttonConfig.color === 'default'" [disabled]="disabled" (click)="click()"
+            type="button">{{buttonConfig.label}}</button>
+        <button mat-stroked-button *ngIf="buttonConfig.color !== 'default'" [disabled]="disabled" (click)="click()"
+            [color]="buttonConfig.color" type="button">{{buttonConfig.label}}</button>
+    </ng-container>
+
+    <ng-container *ngIf="buttonConfig.type === 'flat'">
+        <button mat-flat-button *ngIf="buttonConfig.color === 'default'" [disabled]="disabled" (click)="click()"
+            type="button">{{buttonConfig.label}}</button>
+        <button mat-flat-button *ngIf="buttonConfig.color !== 'default'" [disabled]="disabled" (click)="click()"
+            [color]="buttonConfig.color" type="button">{{buttonConfig.label}}</button>
+    </ng-container>
+
+
+</span>

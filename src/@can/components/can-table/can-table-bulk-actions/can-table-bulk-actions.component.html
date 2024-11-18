@@ -1,0 +1,7 @@
+<div>
+    <span *ngFor="let bulkAction of bulkActionConfig">
+        <ng-container *canValidatePermission="bulkAction.permission">
+            <can-download *ngIf="bulkAction.type === 'download'" [downloadConfig]="bulkAction"></can-download>
+        </ng-container>
+    </span>
+</div>

@@ -1,0 +1,64 @@
+<div class="minicard-loader" *ngIf="isLoad">
+  <can-loader></can-loader>
+</div>
+
+<div class="main-container mat-elevation-z3" *ngIf="miniCardConfig" style="padding: 15px;">
+  <h2>{{ miniCardConfig.header }}</h2>
+
+  <div class="header-action">
+    <ng-container  >
+            <ng-container *ngFor="let fieldActionDef of headerActionDefs">
+                <ng-container>
+                    <button mat-stroked-button color="primary" (click)="applyFieldAction(data, fieldActionDef)"
+                        class="action-button">
+                        <can-icon [iconConfig]="fieldActionDef.icon"></can-icon>
+                    </button>
+    
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    
+    </div>  
+
+
+  <div
+    class="flex-container flex-container-wrap scroll-y"
+    [ngClass]="{
+      'flex-container-wrap':
+        miniCardConfig.display === 'scroll-y' ||
+        miniCardConfig.display === 'wrap',
+      'scroll-y': miniCardConfig.display === 'scroll-y',
+      'scroll-x': miniCardConfig.display === 'scroll-x'
+    }"
+  >
+    <ng-container *ngFor="let data of dataSource">
+      <div
+        class="text-container"
+        [ngStyle]="{
+          'background-color': miniCardConfig.backgroundColor
+            ? miniCardConfig.backgroundColor
+            : '#673BB6'
+        }"
+      >
+        <h3
+          [ngStyle]="{
+            color: miniCardConfig.mainText.color
+              ? miniCardConfig.mainText.color
+              : '#ffffff'
+          }"
+        >
+          {{ getValueWithSuffixAndPrefix(miniCardConfig.mainText, data) }}
+        </h3>
+        <p
+          [ngStyle]="{
+            color: miniCardConfig.subText.color
+              ? miniCardConfig.subText.color
+              : '#ffffff'
+          }"
+        >
+          {{ getValueWithSuffixAndPrefix(miniCardConfig.subText, data) }}
+        </p>
+      </div>
+    </ng-container>
+  </div>
+</div>

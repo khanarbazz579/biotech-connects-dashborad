@@ -1,0 +1,37 @@
+<div class="image-container">
+  <!-- Image Display -->
+  <pinch-zoom>
+    <img [src]="imagesData[selectedIndex].image.src" [alt]="imagesData[selectedIndex].image.alt" />
+  </pinch-zoom>
+  <mat-icon class="previous-image-selector" *ngIf="selectedIndex>0" (click)="selectedIndex = selectedIndex-1;">
+    navigate_before</mat-icon>
+  <mat-icon class="next-image-selector" *ngIf="selectedIndex<imagesData.length-1"
+    (click)="selectedIndex = selectedIndex+1;">navigate_next</mat-icon>
+
+  <div class="images-scroller" *ngIf="imagesData.length>1">
+    <div class="scroll-button">
+      <mat-icon class="previous-scroll" (click)="onPreviousScrollPosition()" *ngIf="previousDisableCheck()">navigate_before</mat-icon>
+    </div>
+    <div #allImagesPanel class="all-images">
+      <span *ngFor="let each of imagesData; let i = index;" (click)="selectedIndex = i">
+        <img [src]="each.image.src" [alt]="each.image.alt" [ngClass]="{'selected-image': selectedIndex===i}" />
+      </span>
+    </div>
+    <div class="scroll-button">
+      <mat-icon class="next-scroll" (click)="onNextScrollPosition()" *ngIf="nextDisableCheck()">navigate_next</mat-icon>
+    </div>
+  </div>
+  <!-- Buttons Display -->
+  <div class="action-buttons">
+    <!-- Download Button -->
+    <button mat-icon-button matTooltip="Download Image" class="left-action-button" color="primary"
+      (click)="onDownloadImage(imagesData[selectedIndex].image.src)">
+      <mat-icon>cloud_download</mat-icon>
+    </button>
+
+    <!-- Close Button -->
+    <button mat-icon-button matTooltip="Close Modal" class="right-action-button" color="warn" (click)="closeModal()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

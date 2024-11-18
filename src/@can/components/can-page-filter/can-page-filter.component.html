@@ -1,0 +1,136 @@
+
+  <div fxLayout="row" fxLayout.xs="row" fxLayoutAlign="space-between center">
+    <div *ngIf="header" class="header-name">
+      <h1>{{dashboardConfig.header}}</h1>
+    </div>
+
+   <div class="filters" fxLayout="row wrap" fxLayoutAlign="start stretch" fxLayoutGap="4%">
+    <div *ngFor="let filterDef of filterDefs">
+
+      <!-- Local Filter -->
+      <span fxFlex *ngIf="filterDef.filtertype === 'local'">
+        <mat-form-field>
+          <input matInput [placeholder]="filterDef.placeholder" [(ngModel)]="filterDef.selectedValue"
+            (ngModelChange)="applyLocalDataFilter()" />
+        </mat-form-field>
+      </span>
+      <!-- Local Filter -->
+
+      <!-- Api Filter -->
+      <span fxFlex *ngIf="filterDef.filtertype === 'api'">
+
+        <!-- Dropdown Filter -->
+        <span *ngIf="filterDef.type === 'dropdown'">
+          <mat-form-field>
+            <mat-label>{{filterDef.placeholder}}</mat-label>
+            <mat-select [(ngModel)]="filterDef.selectedValue" (ngModelChange)="applyApiDataFilter()">
+              <mat-option *ngFor="let each of filterDef.value" [value]="each.value">
+                {{each.viewValue | uppercase}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </span>
+        <!-- Dropdown Filter -->
+
+        <!-- Text Filter -->
+        <span *ngIf="filterDef.type === 'text'">
+          <!-- Manual Filter -->
+          <span *ngIf="filterDef.searchType === 'manual'">
+            <mat-form-field>
+              <input matInput [placeholder]="filterDef.placeholder" (ngModelChange)="applyApiDataFilter()"
+                [(ngModel)]="filterDef.selectedValue" />
+            </mat-form-field>
+          </span>
+          <!-- Manual Filter -->
+
+          <!-- Autocomplete Filter -->
+          <span *ngIf="filterDef.searchType === 'autocomplete'">
+            <!-- Autocomplete Local Filter -->
+            <span *ngIf="filterDef.autoComplete.type === 'local'">
+              <mat-form-field>
+                <input type="text" matInput [placeholder]="filterDef.placeholder"
+                  [(ngModel)]="filterDef.autoComplete.autocompleteSearchText" [matAutocomplete]="auto">
+              </mat-form-field>
+              <mat-autocomplete #auto="matAutocomplete"
+                (optionSelected)="applyAutoCompleteFilter(filterDef, $event.option.value)" [displayWith]="displayFn">
+                <mat-option
+                  *ngFor="let option of filterDef.value | filterList: filterDef.autoComplete.autocompleteSearchText"
+                  [value]="option">{{option.viewValue}}</mat-option>
+              </mat-autocomplete>
+            </span>
+            <!-- Autocomplete Local Filter -->
+
+            <!-- Autocomplete Api Filter -->
+            <span *ngIf="filterDef.autoComplete.type === 'api'">
+              <mat-form-field>
+                <input type="text" matInput [placeholder]="filterDef.placeholder"
+                  [(ngModel)]="filterDef.autoComplete.autocompleteSearchText" [matAutocomplete]="auto"
+                  (ngModelChange)="getAutocompletes(filterDef, autocompleteFilterSpinner)"
+                  (keyup)="getAutoCompletekeyEvent($event, filterDef)">
+                <mat-spinner #autocompleteFilterSpinner [diameter]="15" matSuffix class="filter-spinner"></mat-spinner>
+              </mat-form-field>
+              <mat-autocomplete #auto="matAutocomplete"
+                (optionSelected)="applyAutoCompleteFilter(filterDef, $event.option.value)" [displayWith]="displayFn">
+                <mat-option *ngFor="let option of filterDef.value" [value]="option">{{option.viewValue}}</mat-option>
+              </mat-autocomplete>
+            </span>
+            <!-- Autocomplete Api Filter -->
+
+          </span>
+          <!-- Autocomplete Filter -->
+
+        </span>
+        <!-- Text Filter -->
+
+        <!-- Radio Filter -->
+        <span *ngIf="filterDef.type === 'radio'">
+          <label id="example-radio-group-label">{{filterDef.placeholder}}</label>
+          <div>
+            <mat-radio-group aria-label="Select an option" [(ngModel)]="filterDef.selectedValue"
+              (ngModelChange)="applyApiDataFilter()">
+              <mat-radio-button *ngFor="let each of filterDef.value" [value]="each.value">{{each.viewValue}}
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </span>
+        <!-- Radio Filter -->
+
+        <!-- Checkbox Filter -->
+        <span *ngIf="filterDef.type === 'checkbox'">
+          <mat-checkbox
+            [ngModel]="filterDef.selectedValue === filterDef.checkbox.activeValue ? true : filterDef.selectedValue === filterDef.checkbox.inActiveValue ? false : null"
+            (ngModelChange)="filterDef.selectedValue = $event ? filterDef.checkbox.activeValue : filterDef.checkbox.inActiveValue;applyApiDataFilter()">
+            {{filterDef.placeholder}}</mat-checkbox>
+        </span>
+        <!-- Checkbox Filter -->
+
+        <!-- Date Filter -->
+        <span *ngIf="filterDef.type === 'date'">
+          <mat-form-field>
+            <input matInput [owlDateTime]="dt" [placeholder]="filterDef.placeholder"
+              [(ngModel)]="filterDef.selectedValue" [owlDateTimeTrigger]="dt"
+              [selectMode]="filterDef.date?.enabledRange? 'range' : 'single'"
+              [min]="filterDef.date?.dateRange?.minDate? filterDef.date.dateRange.minDate: undefined"
+              [max]="filterDef.date?.dateRange?.maxDate? filterDef.date.dateRange.maxDate: undefined"
+              (ngModelChange)="applyApiDataFilter()">
+            <mat-icon class="date-picker-icon" matSuffix [owlDateTimeTrigger]="dt">calendar_today</mat-icon>
+          </mat-form-field>
+          <owl-date-time #dt [pickerType]="filterDef.date?.enabledTime? 'both': 'calendar'"></owl-date-time>
+        </span>
+        <!-- Date Filter -->
+
+      </span>
+      <!-- Api Filter -->
+
+      <!-- Filter Clear Icon -->
+      <span fxFlex *ngIf="!Helper.isEmpty(filterDef.selectedValue) && filterDef.selectedValue.toString().trim()"
+        class="filter-clear-icon">
+        <mat-icon aria-hidden="false" aria-label="Remove Filter" class="clear-icon" matTooltip="Remove Filter"
+          (click)="removeFilter(filterDef)">clear
+        </mat-icon>
+      </span>
+      <!-- Filter Clear Icon -->
+
+    </div>
+  </div>
+  </div>

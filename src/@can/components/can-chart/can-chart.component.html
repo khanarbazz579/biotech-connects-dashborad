@@ -1,0 +1,58 @@
+<!-- <div class="header">
+<div *ngIf="header" class="header-name">
+        <h1>{{header}}</h1>
+</div>
+<div class="header-action">
+<ng-container  >
+        <ng-container *ngFor="let fieldActionDef of headerActionDefs">
+            <ng-container>
+                <button mat-stroked-button color="primary" (click)="applyFieldAction(data, fieldActionDef)"
+                    class="action-button">
+                    <can-icon [iconConfig]="fieldActionDef.icon"></can-icon>
+                </button>
+
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+</div>   
+</div>   -->
+<div class="main-container mat-elevation-z3" style="padding: 15px;">
+<div class="header-container">
+    <!-- Header Name -->
+    <div class="heading" *ngIf="header || actionDef">
+        <h2>{{header}}</h2>
+        <ng-container *ngIf="actionDef">
+            <div *ngFor="let action of actionDef">
+                <div *canValidatePermission="action.action.permission" class="action-icon">
+                    <can-icon [iconConfig]="action.icon" (click)="applyAction(action.action)"
+                        *ngIf="displayValidate(action.action.displayCondition)"></can-icon>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+    <!-- Header Name -->
+    <!-- Header Action Button -->
+
+    <!-- Header Action Button -->
+</div>
+
+<div class="main-chart-container" *ngIf="options">
+</div>
+
+<div id="container" (resized)="onResize()">
+</div>
+<div class="action-footer" >
+        <ng-container >
+            <ng-container *ngFor="let fieldActionDef of footerActionDefs">
+                <ng-container >
+                    
+                   <can-button [buttonConfig]="fieldActionDef"
+                   (onClick)="applyFieldAction(data, fieldActionDef)"></can-button>
+                </ng-container>
+            </ng-container>
+    </ng-container>
+     
+    </div>
+</div>
+

@@ -1,0 +1,5 @@
+<div #fabButton class="fab-button">
+    <button mat-fab aria-label="fab icon" (click)="onClick()" *canValidatePermission="permission">
+        <can-icon [iconConfig]="icon"></can-icon>
+    </button>
+</div>

@@ -1,0 +1,31 @@
+<div class="document-container">
+    <!-- Document Display -->
+    <div class="document-box">
+        <div class="left">
+            <mat-icon class="previous-document-selector" (click)="selectedIndex = selectedIndex-1;"
+                *ngIf="selectedIndex>0">
+                navigate_before</mat-icon>
+        </div>
+        <div class="middle">
+            <mat-icon>{{getDocumentIcon(documentsData[selectedIndex].document.src)}}</mat-icon>
+        </div>
+        <div class="right">
+            <mat-icon class="next-document-selector" (click)="selectedIndex = selectedIndex+1;"
+                *ngIf="selectedIndex<documentsData.length-1">navigate_next</mat-icon>
+        </div>
+    </div>
+    <!-- Buttons Display -->
+    <div class="action-buttons">
+        <!-- Download Button -->
+        <button mat-icon-button matTooltip="Download" class="left-action-button" color="primary"
+            (click)="onDocDownload(documentsData[selectedIndex].document.src, documentsData[selectedIndex].document.extension)">
+            <mat-icon>cloud_download</mat-icon>
+        </button>
+
+        <!-- Close Button -->
+        <button mat-icon-button matTooltip="Close Modal" class="right-action-button" color="warn"
+            (click)="closeModal()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>

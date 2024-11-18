@@ -1,0 +1,24 @@
+.header{
+    display: flex,
+}
+.header-name{
+    display: flex;
+    justify-content: flex-start;
+    flex: 1
+}
+.header-action{
+    flex: 2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center
+}
+.action-button{
+    border: none,
+}
+.header-action button{
+    margin: 0;
+    padding: 0;
+    min-width: 30px;
+    margin-right: 15px
+}
+

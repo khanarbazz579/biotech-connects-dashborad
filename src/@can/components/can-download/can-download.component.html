@@ -1,0 +1,12 @@
+<div class="download-button" fxLayout="row" fxLayout.xs="row" fxLayoutAlign="end center" >
+<button mat-stroked-button color="primary" class="download-button-1" (click)="download()" [matTooltip]="downloadConfig.tooltip">
+        <div class="download-button" fxLayout="row" fxLayout.xs="row" fxLayoutAlign="space-evenly center" >
+    <mat-icon aria-hidden="false" *ngIf="!spinner" aria-label="Download" class="spinner">arrow_downward</mat-icon>
+    <mat-spinner class="spinner" *ngIf="spinner" diameter="20"  mode="indeterminate"></mat-spinner>
+       
+    {{downloadConfig.label}}
+</div>
+</button>
+
+</div>
+

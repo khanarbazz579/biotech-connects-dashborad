@@ -1,0 +1,150 @@
+.main-form-container {
+  position: relative;
+  margin: 0 auto;
+  .multi-checkbox {
+    mat-checkbox {
+      margin-bottom: 4px;
+      margin-right: 4px;
+    }
+    .label {
+      font-size: 14px;
+    }
+  }
+  .form-buttons {
+    margin-top: 10px;
+  }
+}
+
+.error-message {
+  color: red;
+}
+
+.date-picker-icon {
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ql-rich-text {
+  max-width: 750px;
+}
+
+.images {
+  padding-bottom: 10px;
+  max-width: 80%;
+  .image-element {
+    max-width: 66px;
+    max-height: 66px;
+    position: relative;
+    display: flex;
+    margin-right: 30px !important;
+    margin-top: 12px;
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    .clear-icon {
+      position: absolute;
+      color: #e60000;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 600;
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+      top: -2px;
+      right: -16px;
+      z-index: 999999;
+    }
+  }
+}
+
+.documents {
+  display: flex;
+  max-width: 80%;
+  .doc {
+    font-size: 40px;
+    margin-right: 20px;
+  }
+
+  .clear-icon {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 600;
+    color: #e60000;
+    background: transparent;
+    width: 12px;
+    height: 12px;
+    color: white;
+    cursor: pointer;
+    margin-top: -11px;
+    z-index: 999999;
+    margin-left: -15px;
+  }
+}
+
+.back-button {
+  margin-right: 10px;
+}
+.tags-container,
+.autocomplete-container,
+.image-container,
+.document-container {
+  mat-spinner {
+    display: none;
+  }
+}
+
+.autocomplete-container,
+.image-container,
+.document-container {
+  mat-spinner {
+    display: none;
+    position: absolute;
+    right: 0px;
+    top: 2px;
+  }
+}
+
+.form-container {
+  display: table;
+  width: 100%;
+  .form-fields {
+    float: left;
+    .toggle {
+      margin-bottom: 16px;
+
+      mat-label {
+        margin-right: 30px;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .ql-editor {
+    height: 100px;
+  }
+  .tags-container,
+  .autocomplete-container,
+  .image-container,
+  .document-container {
+    mat-spinner {
+      circle {
+        color: black;
+      }
+    }
+  }
+  .form-container {
+    .form-fields {
+      .mat-form-field {
+        width: -webkit-fill-available;
+        margin: 0px 8px 0px 0px;
+      }
+    }
+  }
+  .multi-checkbox {
+    .mat-checkbox-label {
+      line-height: unset;
+    }
+  }
+}

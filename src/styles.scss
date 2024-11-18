@@ -1,0 +1,108 @@
+/* Global Stylesheets */
+@import "~ng-pick-datetime/assets/style/picker.min.css";
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding: 0;
+  font-size: 12px !important;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mat-list-item-content {
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.flat-icon-custom:before{
+  padding: 4px 4px 4px 0px; 
+  margin-left: 0px !important;
+}
+
+
+.mat-list-item-content a:hover {
+  color: #C4027F!important;
+  background-color: #F2F4F4;
+  border-radius: .25rem;
+  font-weight: 500;
+  font-size: .8125rem;
+}
+.flat-icon-custom:before{
+  padding: 4px 4px 4px 0px;
+  margin-left: 0px !important;
+}
+.mat-list-text a {
+  font-weight: 500;
+  font-size: .8125rem;
+  font-family: 'Rubik', sans-serif;
+  padding-top: 4px!important;
+}
+.sidenav-container {
+  flex: 1;
+  .active-list-item {
+    background-color: #F2F4F4!important;
+    border-radius: .25rem;
+    font-weight: 500;
+    font-size: .8125rem;
+    color: #C4027F!important;
+    }
+}
+.mat-icon-custom, .flaticon-logout {
+  // color: #ED1C24!important;
+  height: auto;
+}
+.flaticon-authentication {
+  color: #C4027F!important;
+}
+.mat-table {
+  font-family: 'Rubik', sans-serif;
+}
+.mat-table th{
+  // font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-weight: bold;
+  font-size: 13px;
+}
+.mat-drawer-side {
+  border-right: none;
+  box-shadow: 0 2px 4px -1px rgba(47,60,74,.12), 0 4px 5px 0 rgba(47,60,74,.08), 0 1px 10px 0 rgba(47,60,74,.06);
+}
+.mat-elevation-z3 {
+  box-shadow: 0 8px 32px rgba(47,60,74,.01), 0 8px 16px rgba(47,60,74,.02);
+  background-color: #fff;
+}
+.mat-drawer-content {
+  background-color:#F2F4F4;
+}
+.mat-flat-button.mat-accent, .mat-raised-button.mat-accent, .mat-fab.mat-accent, .mat-mini-fab.mat-accent {
+ background-color: #C4027F;
+ color: #fff;
+}
+button.mat-fab .mat-icon-custom{
+  color: #fff!important;
+}
+.mat-list-base .mat-list-item .mat-list-icon, .mat-list-base .mat-list-option .mat-list-icon {
+  height:auto!important;
+}
+.mat-toolbar {
+  background-color: #fff!important;
+  z-index: 999;
+  box-shadow: 0 2px 4px -1px rgba(47,60,74,.12), 0 4px 5px 0 rgba(47,60,74,.08), 0 1px 10px 0 rgba(47,60,74,.06);
+}
+.app-name {
+  color: #C4027F;
+}
+.mat-button-wrapper .mat-icon {
+  color: #C4027F;
+}
+.mat-table tr:nth-of-type(even){
+  background-color:rgba(242, 244, 244, 0.5);
+}

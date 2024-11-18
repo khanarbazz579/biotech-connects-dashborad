@@ -1,0 +1,13 @@
+<mat-card>
+  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
+    <div fxFlex="20%">
+      <mat-form-field>
+        <input
+          matInput
+          (keyup)="applyFilter($event.target.value)"
+          placeholder="Filter Data"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+</mat-card>

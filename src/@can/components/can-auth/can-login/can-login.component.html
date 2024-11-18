@@ -1,0 +1,85 @@
+<can-loader *ngIf="isLoading"></can-loader>
+
+<div class="login-wrapper">
+  <div class="login-container" fxLayout="row" fxLayoutAlign="center center">
+    <div class="w-100">
+      <!-- Logo -->
+      <div class="logo">
+        <img [src]="logo" alt="logo" />
+      </div>
+      <!-- Logo -->
+
+      <!-- OTP Form -->
+      <form [formGroup]="loginForm">
+        <div fxLayout="column">
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              name="email"
+              placeholder="Email"
+              formControlName="email"
+            />
+          </mat-form-field>
+          <!-- <div
+            *ngIf="otpForm.controls.username.invalid && otpForm.controls.username.dirty && otpForm.controls.username.touched"
+            class="error">
+            <mat-error *ngIf="otpForm.controls.username.errors.required">
+              Username is required.
+            </mat-error>
+            <mat-error *ngIf="otpForm.controls.username.errors.pattern">
+              Please enter valid username.
+            </mat-error>
+          </div> -->
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              name="password"
+              type="password"
+              placeholder="Password"
+              formControlName="password"
+            />
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="onLogin()">
+            Login
+          </button>
+        </div>
+      </form>
+      <!-- OTP Form -->
+
+      <!-- Login Form -->
+      <!-- <form #loginForm="ngForm" *ngIf="loginForm">
+        <div fxLayout="column">
+          <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput [(ngModel)]="credentials.username" name="username" placeholder="Username" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>OTP</mat-label>
+            <input matInput [(ngModel)]="credentials.otp" name="otp" placeholder="Otp" required pattern="^\d{6}$" />
+          </mat-form-field>
+
+          <div *ngIf="loginForm.controls.otp.invalid && loginForm.controls.otp.dirty && loginForm.controls.otp.touched"
+            class="error">
+            <mat-error *ngIf="loginForm.controls.otp.errors.required">
+              OTP is required.
+            </mat-error>
+            <mat-error *ngIf="loginForm.controls.otp.errors.pattern">
+              Please enter valid OTP.
+            </mat-error>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput ngModel name="username" placeholder="Password" required />
+          </mat-form-field>
+        </div>
+      </form> -->
+      <!-- Login Form -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="upload">
+    <mat-form-field>
+        <ngx-mat-file-input #removableInput [placeholder]="uploadConfig.placeholder" [(ngModel)]="selectedFile" [accept]="uploadConfig.acceptType"></ngx-mat-file-input>
+        <button mat-icon-button matSuffix *ngIf="!removableInput.empty" (click)="removableInput.clear($event)">
+            <mat-icon>clear</mat-icon>
+        </button>
+    </mat-form-field>
+    <button mat-raised-button color="primary" class="upload-button" (click)="upload()" [disabled]="selectedFile?false:true">
+        <mat-icon aria-hidden="false" aria-label="Upload">arrow_upward</mat-icon>
+        {{uploadConfig.label}}
+    </button>
+</div>

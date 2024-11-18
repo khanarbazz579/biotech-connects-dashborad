@@ -1,0 +1,296 @@
+<div class="card-loader" *ngIf="isLoad">
+    <can-loader></can-loader>
+  </div>
+  
+  <div
+    class="card-container"
+    *ngIf="dataSource && _.isArray(dataSource) && dataSource.length"
+    infiniteScroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="50"
+    (scrolled)="onScroll($event)"
+    [infiniteScrollDisabled]="scrollDisabled"
+    [scrollWindow]="isSmallScreen ? true : false"
+    (scroll)="checkScroll($event)"
+    #cardContainer
+  >
+    <div fxLayout="row wrap" fxLayoutAlign="start start">
+      <div
+        *ngFor="let each of dataSource; let i = index"
+        [fxFlex]="isSmallScreen ? '100%' : 100 / columnPerRow + '%'"
+        style="padding: 2%;"
+      >
+        <!-- Default -->
+        <ng-container *ngIf="cardViewConfig.type === 'default'">
+          <mat-card>
+            <!-- Header -->
+            <mat-card-header *ngIf="cardViewConfig.profile">
+              <!-- Profile Image -->
+              <div
+                mat-card-avatar
+                *ngIf="getValue(cardViewConfig.profile.profileImage, each)"
+              >
+                <img
+                  [src]="getValue(cardViewConfig.profile.profileImage, each)"
+                  [alt]="
+                    cardViewConfig.profile.profileImage.imageAlt
+                      ? cardViewConfig.profile.profileImage.imageAlt
+                      : ''
+                  "
+                  class="profile-image"
+                  [ngClass]="{ 'round-image': cardViewConfig.profile.roundImage }"
+                />
+              </div>
+              <!-- Profile Image -->
+  
+              <!-- Profile Name -->
+              <mat-card-title
+                >{{
+                  getValueWithSuffixAndPrefix(
+                    cardViewConfig.profile.profileName,
+                    each
+                  )
+                }}
+              </mat-card-title>
+              <!-- Profile Name -->
+  
+              <!-- Profile Sub Text -->
+              <mat-card-subtitle>
+                {{
+                  getValueWithSuffixAndPrefix(
+                    cardViewConfig.profile.profileSubText,
+                    each
+                  )
+                }}
+              </mat-card-subtitle>
+              <!-- Profile Sub Text -->
+            </mat-card-header>
+            <!-- Header -->
+  
+            <!-- Card Image -->
+            <div
+              mat-card-image
+              style="overflow: hidden;"
+              *ngIf="
+                cardViewConfig.image &&
+                createImagesData(cardViewConfig.image, each)?.length > 1
+              "
+            >
+              <can-caraousel
+                [imagesData]="createImagesData(cardViewConfig.image, each)"
+              ></can-caraousel>
+              
+            </div>
+            <div
+              *ngIf="
+                cardViewConfig.image &&
+                createImagesData(cardViewConfig.image, each)?.length == 1
+              "
+              mat-card-image
+              style="overflow: hidden;"
+              [ngStyle]="{'background-image': 'url(' + createImagesData(cardViewConfig.image, each)[0].image.src + ')','height':cardViewConfig.image.maxHeight +'px'}"
+              class = "card-img"
+              
+            >
+              
+            </div>
+            <!-- Card Image -->
+  
+            <!-- Card Content -->
+            <mat-card-content
+              *ngIf="
+                getValueWithSuffixAndPrefix(cardViewConfig.title, each) ||
+                getValueWithSuffixAndPrefix(cardViewConfig.subTitle, each) ||
+                getValueWithSuffixAndPrefix(cardViewConfig.content, each)
+              "
+            >
+              <!-- Title -->
+              <mat-card-title class="capitalize line-break">{{
+                getValueWithSuffixAndPrefix(cardViewConfig.title, each)
+              }}</mat-card-title>
+              <!-- Title -->
+  
+              <!-- Sub Title -->
+              <mat-card-subtitle class="capitalize line-break"
+                >{{ getValueWithSuffixAndPrefix(cardViewConfig.subTitle, each) }}
+              </mat-card-subtitle>
+              <!-- Sub Title -->
+  
+              <!-- Content -->
+              <p
+                #cardContent
+                class="line-break"
+                [ngClass]="{
+                  'expandable-content':
+                    cardViewConfig.maxContentLines && !expanded[i]
+                }"
+                [ngStyle]="{
+                  '-webkit-line-clamp':
+                    cardViewConfig.maxContentLines && !expanded[i]
+                      ? cardViewConfig.maxContentLines
+                      : '',
+                  '-webkit-box-orient':
+                    cardViewConfig.maxContentLines && !expanded[i]
+                      ? 'vertical'
+                      : 'vertical'
+                }"
+              >
+                {{getValueWithSuffixAndPrefix(cardViewConfig.content, each) }}
+              </p>
+  
+              <!-- Expand Icon -->
+              <mat-icon
+                class="expandable-icon"
+                [@indicatorRotate]="expanded[i] ? 'expanded' : 'collapsed'"
+                (click)="expanded[i] = !expanded[i]"
+                *ngIf="expandableIcon(cardContent, i)"
+              >
+                expand_more
+              </mat-icon>
+              <div class="clear-float"></div>
+              <!-- Expand Icon -->
+  
+              <!-- Content -->
+            </mat-card-content>
+            <!-- Card Content -->
+  
+            <!-- Actions -->
+            <mat-card-actions *ngIf="actionButtons?.length">
+              <span *ngFor="let actionButton of actionButtons">
+                <span *canValidatePermission="actionButton.action.permission">
+                  <span
+                    *ngIf="
+                      actionDisplayValidate(
+                        actionButton.action.displayCondition,
+                        each
+                      )
+                    "
+                  >
+                    <can-button
+                      [buttonConfig]="actionButton.button"
+                      (click)="applyAction(actionButton.action, each)"
+                    ></can-button>
+                  </span>
+                </span>
+              </span>
+              <div class="clear-float"></div>
+            </mat-card-actions>
+            <!-- Actions -->
+          </mat-card>
+        </ng-container>
+        <!-- Default -->
+  
+        <!-- Inset -->
+        <ng-container *ngIf="cardViewConfig.type === 'inset'">
+          <mat-card>
+            <div
+              fxLayout="row"
+              fxLayoutAlign="space-between center"
+              fxLayoutGap="30px"
+            >
+              <div fxFlex="70%">
+                <!-- Title -->
+                <mat-card-title
+                  >{{ getValueWithSuffixAndPrefix(cardViewConfig.title, each) }}
+                </mat-card-title>
+                <!-- Title -->
+  
+                <!-- Sub Title -->
+                <mat-card-subtitle
+                  >{{
+                    getValueWithSuffixAndPrefix(cardViewConfig.subTitle, each)
+                  }}
+                </mat-card-subtitle>
+                <!-- Sub Title -->
+              </div>
+  
+              <div
+                fxFlex="30%"
+                *ngIf="
+                  cardViewConfig.insetImage &&
+                  getValue(cardViewConfig.insetImage, each)
+                "
+                class="inset-image-container"
+              >
+                <!-- Card Image -->
+                <img
+                  [src]="getValue(cardViewConfig.insetImage, each)"
+                  class="inset-image"
+                  [alt]="
+                    cardViewConfig.insetImage.imageAlt
+                      ? cardViewConfig.insetImage.imageAlt
+                      : ''
+                  "
+                />
+                <!-- Card Image -->
+              </div>
+            </div>
+  
+            <!-- Card Content -->
+            <mat-card-content>
+              <!-- Content -->
+              <p
+                #cardContent
+                [ngClass]="{
+                  'expandable-content':
+                    cardViewConfig.maxContentLines && !expanded[i]
+                }"
+                [ngStyle]="{
+                  '-webkit-line-clamp':
+                    cardViewConfig.maxContentLines && !expanded[i]
+                      ? cardViewConfig.maxContentLines
+                      : '',
+                  '-webkit-box-orient':
+                    cardViewConfig.maxContentLines && !expanded[i]
+                      ? 'vertical'
+                      : 'vertical'
+                }"
+              >
+                {{ getValueWithSuffixAndPrefix(cardViewConfig.content, each) }}
+              </p>
+  
+              <!-- Expand Icon -->
+              <mat-icon
+                class="expandable-icon"
+                [@indicatorRotate]="expanded[i] ? 'expanded' : 'collapsed'"
+                (click)="expanded[i] = !expanded[i]"
+                *ngIf="expandableIcon(cardContent, i)"
+                >expand_more
+              </mat-icon>
+              <div class="clear-float"></div>
+              <!-- Expand Icon -->
+  
+              <!-- Content -->
+            </mat-card-content>
+            <!-- Card Content -->
+  
+            <!-- Actions -->
+            <mat-card-actions *ngIf="actionButtons?.length">
+              <can-button
+                *ngFor="let actionButton of actionButtons"
+                [buttonConfig]="actionButton.button"
+                (click)="applyAction(actionButton.action, each)"
+              ></can-button>
+              <mat-icon
+                class="expandable-icon"
+                [@indicatorRotate]="expanded[i] ? 'expanded' : 'collapsed'"
+                (click)="expanded[i] = !expanded[i]"
+                *ngIf="expandableIcon(cardContent, i)"
+                >expand_more
+              </mat-icon>
+              <div class="clear-float"></div>
+            </mat-card-actions>
+            <!-- Actions -->
+          </mat-card>
+        </ng-container>
+        <!-- Inset -->
+      </div>
+    </div>
+  
+    <div class="go-to-top" *ngIf="scrolled || windowScrolled">
+      <button mat-raised-button color="primary" (click)="gotToTop()">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </button>
+    </div>
+  </div>
+  

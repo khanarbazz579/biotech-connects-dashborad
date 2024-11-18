@@ -1,0 +1,902 @@
+<div
+  class="main-container mat-elevation-z{{
+    tableConfig.elevation >= 0 ? tableConfig.elevation : 3
+  }}"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50"
+  [infiniteScrollDisabled]="scrollDisabled"
+  (scrolled)="onScroll($event)"
+  [scrollWindow]="isSmallScreen ? true : false"
+  [ngClass]="{
+    'scroll-container': !tableConfig.pagination,
+    'disable-container': isLoad
+  }"
+>
+  <!-- Loader -->
+  <can-loader *ngIf="isLoad"></can-loader>
+
+  <!-- Header -->
+  <div
+    fxLayout="row"
+    fxLayout.xs="row"
+    fxLayoutAlign="space-between center"
+    *ngIf="!tableConfig.hideRefreshButton"
+  >
+    <div *ngIf="header" class="header-name">
+      <h1>{{ header }}</h1>
+    </div>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      class="refresh-button"
+      (click)="processTableData()"
+    >
+      <mat-icon aria-hidden="false" aria-label="Refresh">refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Upload File -->
+  <ng-container *ngIf="uploadDef">
+    <can-upload
+      *canValidatePermission="uploadDef.permission"
+      [uploadConfig]="uploadDef"
+      (updateTable)="processTableData()"
+    ></can-upload>
+  </ng-container>
+
+  <!-- Table Bulk Field Action -->
+  <mat-form-field
+    class="action-bx"
+    *ngIf="bulkFieldActionDefs && bulkFieldActionDefs.length"
+  >
+    <mat-label>Action</mat-label>
+    <mat-select>
+      <ng-container *ngFor="let bulkFieldAction of bulkFieldActionDefs">
+        <mat-option
+          [value]="a"
+          (keydown)="$event.stopPropagation()"
+          (click)="applyBulkFieldAction(bulkFieldAction)"
+          *canValidatePermission="bulkFieldAction.permission"
+        >
+          {{ bulkFieldAction.label }}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Table Filter -->
+  <div
+    class="filters"
+    fxLayout="row wrap"
+    fxLayoutAlign="start stretch"
+    fxLayoutGap="4%"
+  >
+    <div *ngFor="let filterDef of filterDefs">
+      <!-- Local Filter -->
+      <span fxFlex *ngIf="filterDef.filtertype === 'local'">
+        <mat-form-field>
+          <input
+            matInput
+            [placeholder]="filterDef.placeholder"
+            [(ngModel)]="filterDef.selectedValue"
+            (ngModelChange)="applyLocalDataFilter()"
+          />
+        </mat-form-field>
+      </span>
+      <!-- Local Filter -->
+
+      <!-- Api Filter -->
+      <span fxFlex *ngIf="filterDef.filtertype === 'api'">
+        <!-- Dropdown Filter -->
+        <span *ngIf="filterDef.type === 'dropdown'">
+          <mat-form-field>
+            <mat-label>{{ filterDef.placeholder }}</mat-label>
+            <mat-select
+              [(ngModel)]="filterDef.selectedValue"
+              (ngModelChange)="applyApiDataFilter(false,filterDef)"
+              (openedChange)="applyPanelChange($event,filterDef)"
+              [multiple]="
+              filterDef.multipleSelect ? filterDef.multipleSelect : false
+            "
+            >
+              <mat-option
+                *ngFor="let each of filterDef.value"
+                [value]="each.value"
+              >
+                {{ each.viewValue | uppercase }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </span>
+        <!-- Dropdown Filter -->
+
+        <!-- Text Filter -->
+        <span *ngIf="filterDef.type === 'text'">
+          <!-- Manual Filter -->
+          <span *ngIf="filterDef.searchType === 'manual'">
+            <mat-form-field>
+              <input
+                matInput
+                [placeholder]="filterDef.placeholder"
+                (ngModelChange)="applyApiDataFilter()"
+                [(ngModel)]="filterDef.selectedValue"
+              />
+            </mat-form-field>
+          </span>
+          <!-- Manual Filter -->
+
+          <!-- Autocomplete Filter -->
+          <span *ngIf="filterDef.searchType === 'autocomplete'">
+            <!-- Autocomplete Local Filter -->
+            <span *ngIf="filterDef.autoComplete.type === 'local'">
+              <mat-form-field>
+                <input
+                  type="text"
+                  matInput
+                  [placeholder]="filterDef.placeholder"
+                  [(ngModel)]="filterDef.autoComplete.autocompleteSearchText"
+                  [matAutocomplete]="auto"
+                />
+              </mat-form-field>
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                (optionSelected)="
+                  applyAutoCompleteFilter(filterDef, $event.option.value)
+                "
+                [displayWith]="displayFn"
+              >
+                <mat-option
+                  *ngFor="
+                    let option of filterDef.value
+                      | filterList
+                        : filterDef.autoComplete.autocompleteSearchText
+                  "
+                  [value]="option"
+                  >{{ option.viewValue }}</mat-option
+                >
+              </mat-autocomplete>
+            </span>
+            <!-- Autocomplete Local Filter -->
+
+            <!-- Autocomplete Api Filter -->
+            <span *ngIf="filterDef.autoComplete.type === 'api'">
+              <mat-form-field>
+                <input
+                  type="text"
+                  matInput
+                  [placeholder]="filterDef.placeholder"
+                  [(ngModel)]="filterDef.autoComplete.autocompleteSearchText"
+                  [matAutocomplete]="auto"
+                  (ngModelChange)="
+                    getAutocompletes(filterDef, autocompleteFilterSpinner)
+                  "
+                  (keyup)="getAutoCompletekeyEvent($event, filterDef)"
+                />
+                <mat-spinner
+                  #autocompleteFilterSpinner
+                  [diameter]="15"
+                  matSuffix
+                  class="filter-spinner"
+                ></mat-spinner>
+              </mat-form-field>
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                (optionSelected)="
+                  applyAutoCompleteFilter(filterDef, $event.option.value)
+                "
+                [displayWith]="displayFn"
+              >
+                <mat-option
+                  *ngFor="let option of filterDef.value"
+                  [value]="option"
+                  >{{ option.viewValue }}</mat-option
+                >
+              </mat-autocomplete>
+            </span>
+            <!-- Autocomplete Api Filter -->
+          </span>
+          <!-- Autocomplete Filter -->
+        </span>
+        <!-- Text Filter -->
+
+        <!-- Radio Filter -->
+        <span *ngIf="filterDef.type === 'radio'">
+          <label id="example-radio-group-label">{{
+            filterDef.placeholder
+          }}</label>
+          <div>
+            <mat-radio-group
+              aria-label="Select an option"
+              [(ngModel)]="filterDef.selectedValue"
+              (ngModelChange)="applyApiDataFilter()"
+            >
+              <mat-radio-button
+                *ngFor="let each of filterDef.value"
+                [value]="each.value"
+                >{{ each.viewValue }}
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </span>
+        <!-- Radio Filter -->
+
+        <!-- Checkbox Filter -->
+        <span *ngIf="filterDef.type === 'checkbox'">
+          <mat-checkbox
+            [ngModel]="
+              filterDef.selectedValue === filterDef.checkbox.activeValue
+                ? true
+                : filterDef.selectedValue === filterDef.checkbox.inActiveValue
+                ? false
+                : null
+            "
+            (ngModelChange)="
+              filterDef.selectedValue = $event
+                ? filterDef.checkbox.activeValue
+                : filterDef.checkbox.inActiveValue;
+              applyApiDataFilter()
+            "
+          >
+            {{ filterDef.placeholder }}</mat-checkbox
+          >
+        </span>
+        <!-- Checkbox Filter -->
+
+        <!-- Date Filter -->
+        <span *ngIf="filterDef.type === 'date'">
+          <mat-form-field>
+            <input
+              matInput
+              [owlDateTime]="dt"
+              [placeholder]="filterDef.placeholder"
+              [(ngModel)]="filterDef.selectedValue"
+              [owlDateTimeTrigger]="dt"
+              [selectMode]="filterDef.date?.enabledRange ? 'range' : 'single'"
+              [min]="
+                filterDef.date?.dateRange?.minDate
+                  ? filterDef.date.dateRange.minDate
+                  : undefined
+              "
+              [max]="
+                filterDef.date?.dateRange?.maxDate
+                  ? filterDef.date.dateRange.maxDate
+                  : undefined
+              "
+              (ngModelChange)="applyApiDataFilter()"
+            />
+            <mat-icon
+              class="date-picker-icon"
+              matSuffix
+              [owlDateTimeTrigger]="dt"
+              >calendar_today</mat-icon
+            >
+          </mat-form-field>
+          <owl-date-time
+            #dt
+            [pickerType]="filterDef.date?.enabledTime ? 'both' : 'calendar'"
+          ></owl-date-time>
+        </span>
+        <!-- Date Filter -->
+        <!-- Download Filter -->
+        <span *ngIf="filterDef.type === 'download'">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="applyApiDownloadFilter()"
+          >
+            <mat-spinner
+              class="spinner"
+              *ngIf="downloadSpinner"
+              diameter="35"
+              mode="indeterminate"
+            ></mat-spinner>
+            <span *ngIf="!downloadSpinner">{{ filterDef.placeholder }}</span>
+          </button>
+        </span>
+        <!-- Download Filter -->
+      </span>
+      <!-- Api Filter -->
+
+      <!-- Filter Clear Icon -->
+      <span
+        fxFlex
+        *ngIf="
+          !Helper.isEmpty(filterDef.selectedValue) &&
+          filterDef.selectedValue.toString().trim()
+        "
+        class="filter-clear-icon"
+      >
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Remove Filter"
+          class="clear-icon"
+          matTooltip="Remove Filter"
+          (click)="removeFilter(filterDef)"
+          >clear
+        </mat-icon>
+      </span>
+      <!-- Filter Clear Icon -->
+    </div>
+    <!-- Table Bulk Actions -->
+    <can-table-bulk-actions
+      class="bulk-actions"
+      *ngIf="bulkActionDefs && bulkActionDefs.length"
+      [bulkActionConfig]="bulkActionDefs"
+    ></can-table-bulk-actions>
+  </div>
+
+  <!-- Table Container -->
+  <div>
+    <div class="table-container">
+      <table
+        mat-table
+        [dataSource]="tableDataSource"
+        [ngClass]="{
+          'left-align': tableConfig.alignment === 'left',
+          'right-align': tableConfig.alignment === 'right',
+          'center-align': tableConfig.alignment === 'center'
+        }"
+      >
+        <!-- Item Column -->
+
+        <ng-container
+          *ngIf="bulkFieldActionDefs && bulkFieldActionDefs.length"
+          matColumnDef="bulkaction"
+          sticky
+        >
+          <th
+          class="word-wrap"
+            mat-header-cell
+            *matHeaderCellDef
+            [ngClass]="{
+              'left-align': tableConfig.alignment === 'left',
+              'right-align': tableConfig.alignment === 'right',
+              'center-align': tableConfig.alignment === 'center'
+            }"
+          >
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            ></mat-checkbox>
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            class="sentenceCase"
+          >
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(element) : null"
+              [checked]="selection.isSelected(element)"
+            ></mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="indexer" matColumnDef="indexer" sticky>
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            [ngClass]="{
+              'left-align': tableConfig.alignment === 'left',
+              'right-align': tableConfig.alignment === 'right',
+              'center-align': tableConfig.alignment === 'center'
+            }"
+          >
+            #
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element; let i = index"
+            class="sentenceCase"
+          >
+            {{
+              tableDataSource.paginator
+                ? i +
+                  1 +
+                  tableDataSource.paginator.pageIndex *
+                    tableDataSource.paginator.pageSize
+                : i + 1
+            }}
+          </td>
+        </ng-container>
+
+        <ng-container
+          *ngFor="let columnDef of columnDefs"
+          [matColumnDef]="columnDef.header"
+        >
+          <!-- Table Header -->
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="word-wrap"
+            [ngClass]="{
+              'left-align': tableConfig.alignment === 'left',
+              'right-align': tableConfig.alignment === 'right',
+              'center-align': tableConfig.alignment === 'center'
+            }"
+          >
+            {{ columnDef.header | uppercase }}
+          </th>
+
+          <!-- Table Data -->
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [ngStyle]="{ color: columnDef.color ? columnDef.color : '' }"
+            class="sentenceCase"
+          >
+            <!-- ========== INLINE IMAGE START ========== -->
+            <span
+              *ngIf="
+                columnDef.inlineImage &&
+                getInlineImage(element, columnDef.inlineImage)
+              "
+            >
+              <img
+                [src]="getInlineImage(element, columnDef.inlineImage).image.src"
+                [alt]="getInlineImage(element, columnDef.inlineImage).image.alt"
+                class="inline-image"
+              />
+            </span>
+            <!--==========INLINE IMAGE END==========-->
+
+            <!-- ========== TEXT TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'text'" [ngClass]="columnDef.wordWrap?'word-wrap':''">
+              {{
+                getValueWithApiKey(
+                  element,
+                  columnDef.value,
+                  columnDef.keySeparators
+                )
+              }}
+            </span>
+            <!-- ========== TEXT TYPE VALUE END ========== -->
+
+            <!-- ========== EMAIL TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'email'" class="lowercase">
+              {{
+                getValueWithApiKey(
+                  element,
+                  columnDef.value,
+                  columnDef.keySeparators
+                ) | lowercase
+              }}
+            </span>
+            <!-- ========== EMAIL TYPE VALUE END ========== -->
+
+            <!-- ========== BOOLEAN TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'boolean'">
+              <!-- Valid Boolean -->
+              <span
+                *ngIf="
+                  _.isBoolean(getValueWithApiKey(element, columnDef.value));
+                  else notValidBoolean
+                "
+              >
+                <!-- Boolean Property Defined -->
+                <span *ngIf="columnDef.boolean; else notValidBoolean">
+                  {{
+                    getValueWithApiKey(element, columnDef.value)
+                      ? columnDef.boolean.trueValue
+                      : columnDef.boolean.falseValue
+                  }}
+                </span>
+              </span>
+
+              <!-- Inavlid Boolean or Boolean Property not defined -->
+              <ng-template #notValidBoolean>
+                {{ getValueWithApiKey(element, columnDef.value) }}
+              </ng-template>
+            </span>
+            <!-- ========== BOOLEAN TYPE VALUE END ========== -->
+
+            <!-- ========== NUMBER TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'number'">
+              {{
+                _.isNumber(getValueWithApiKey(element, columnDef.value))
+                  ? (getValueWithApiKey(element, columnDef.value) | number)
+                  : getValueWithApiKey(element, columnDef.value)
+              }}
+            </span>
+            <!-- ========== NUMBER TYPE VALUE END ========== -->
+
+            <!-- ========== CURRENCY TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'currency'">
+              <!-- getValueWithApiKey(element, columnDef.value) -->
+              {{
+                _.isNumber(getCurrencyValue(element, columnDef.value))
+                  ? (getCurrencyValue(element, columnDef.value)
+                    | currency: "INR":"symbol")
+                  : getCurrencyValue(element, columnDef.value)
+              }}
+            </span>
+            <!-- ========== CURRENCY TYPE VALUE END ========== -->
+
+            <!-- ========== DATE TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'date'">
+              {{
+                getValueWithApiKey(element, columnDef.value) !== "-"
+                  ? (getValueWithApiKey(element, columnDef.value)
+                    | date: columnDef.dateDisplayType || "dd/MM/yy hh:mm:ss")
+                  : getValueWithApiKey(element, columnDef.value)
+              }}
+            </span>
+            <!-- ========== DATE TYPE VALUE END ========== -->
+
+            <!-- ========== ICON TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'icon'">
+              <can-icon [iconConfig]="columnDef.icon"></can-icon>
+            </span>
+            <!-- ========== ICON TYPE VALUE END ========== -->
+
+            <!-- ========== IMAGE TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'image'">
+              <ng-container *ngIf="!columnDef.images.showAll">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="
+                    onImageDisplay(
+                      element,
+                      columnDef.images,
+                      columnDef.modalWidth
+                    )
+                  "
+                  *ngIf="getImageCount(element, columnDef.images.imageItems)"
+                >
+                  <mat-icon matTooltip="View">image</mat-icon>
+                </button>
+                <span
+                  *ngIf="!getImageCount(element, columnDef.images.imageItems)"
+                  >-</span
+                >
+                <label>{{
+                  getImageCount(element, columnDef.images.imageItems) > 1
+                    ? "-" + getImageCount(element, columnDef.images.imageItems)
+                    : ""
+                }}</label>
+              </ng-container>
+              <ng-container *ngIf="columnDef.images.showAll">
+                <ng-container
+                  *ngIf="getImageCount(element, columnDef.images.imageItems)"
+                >
+                  <div fxLayout="row" fxLayoutGap="2%" class="inline-images">
+                    <ng-container
+                      *ngFor="
+                        let each of getImages(
+                          element,
+                          columnDef.images.imageItems
+                        );
+                        trackBy: trackByIndex;
+                        let i = index
+                      "
+                    >
+                      <img
+                        [src]="each.image.src"
+                        [alt]="each.image.alt"
+                        (click)="
+                          onImageDisplay(
+                            element,
+                            columnDef.images,
+                            columnDef.modalWidth,
+                            i
+                          )
+                        "
+                      />
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <span
+                  *ngIf="!getImageCount(element, columnDef.images.imageItems)"
+                  >-</span
+                >
+              </ng-container>
+            </span>
+            <!-- ========== IMAGE TYPE VALUE END ========== -->
+
+            <!-- ========== DOCUMENT TYPE VALUE END ========== -->
+            <span *ngIf="columnDef.type === 'document'">
+              <ng-container *ngIf="!columnDef.documents.showAll">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="
+                    onDocumentDisplay(
+                      element,
+                      columnDef.documents,
+                      columnDef.modalWidth
+                    )
+                  "
+                  *ngIf="
+                    getDocumentCount(element, columnDef.documents.documentItems)
+                  "
+                >
+                  <mat-icon matTooltip="View Documents">description</mat-icon>
+                </button>
+                <span
+                  *ngIf="
+                    !getDocumentCount(
+                      element,
+                      columnDef.documents.documentItems
+                    )
+                  "
+                  >-</span
+                >
+                <label>{{
+                  getDocumentCount(element, columnDef.documents.documentItems) >
+                  1
+                    ? "-" +
+                      getDocumentCount(
+                        element,
+                        columnDef.documents.documentItems
+                      )
+                    : ""
+                }}</label>
+              </ng-container>
+              <ng-container *ngIf="columnDef.documents.showAll">
+                <ng-container
+                  *ngIf="
+                    getDocumentCount(element, columnDef.documents.documentItems)
+                  "
+                >
+                  <ng-container
+                    *ngFor="
+                      let each of getDocuments(
+                        element,
+                        columnDef.documents.documentItems
+                      );
+                      trackBy: trackByIndex;
+                      let i = index
+                    "
+                  >
+                    <button mat-icon-button color="primary">
+                      <mat-icon
+                        matTooltip="View"
+                        (click)="
+                          onDocumentDisplay(
+                            element,
+                            columnDef.documents,
+                            columnDef.modalWidth,
+                            i
+                          )
+                        "
+                      >
+                        {{ getDocumentIcon(each.document.src) }}</mat-icon
+                      >
+                    </button>
+                  </ng-container>
+                </ng-container>
+                <span
+                  *ngIf="
+                    !getDocumentCount(
+                      element,
+                      columnDef.documents.documentItems
+                    )
+                  "
+                  >-</span
+                >
+              </ng-container>
+            </span>
+            <!-- ========== DOCUMENT TYPE VALUE END ========== -->
+
+            <!-- ========== LINK TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'link'">
+              <!-- Valid Link Value -->
+              <span
+                *ngIf="
+                  getValueWithApiKey(element, columnDef.value) !== '-';
+                  else emptyValue
+                "
+              >
+                <!-- Valid Self URL -->
+                <span
+                  *ngIf="columnDef.link.target === 'self'; else externalUrl"
+                >
+                  <span
+                    *ngIf="
+                      !isUrl(getValueWithApiKey(element, columnDef.value));
+                      else notValidSelfUrl
+                    "
+                  >
+                    <a
+                      color="primary"
+                      matTooltip="Open Self URL"
+                      (click)="
+                        onOpenSelfUrl(
+                          getValueWithApiKey(element, columnDef.value),
+                          element
+                        )
+                      "
+                    >
+                      {{ getValueWithApiKey(element, columnDef.value) }}
+                    </a>
+                  </span>
+                  <!-- Invalid Self URL -->
+                  <ng-template #notValidSelfUrl>
+                    <span class="warn">Invalid 'self' url</span>
+                  </ng-template>
+                </span>
+
+                <!-- External URL -->
+                <ng-template #externalUrl>
+                  <span *ngIf="columnDef.link.target === 'external'">
+                    <a
+                      color="primary"
+                      matTooltip="Open External Url"
+                      (click)="
+                        onOpenExternalUrl(
+                          getValueWithApiKey(element, columnDef.value),
+                          element
+                        )
+                      "
+                    >
+                      {{ getValueWithApiKey(element, columnDef.value) }}
+                    </a>
+                  </span>
+                </ng-template>
+              </span>
+
+              <!-- Invalid Link Value -->
+              <ng-template #emptyValue>
+                <span>-</span>
+              </ng-template>
+            </span>
+            <!-- ========== LINK TYPE VALUE END ========== -->
+
+            <!-- ========== ENUM TYPE VALUE START ========== -->
+            <span
+              *ngIf="columnDef.type === 'enum'"
+              [ngStyle]="{
+                background: displayBackgroundForEnum(
+                  getValueWithApiKey(element, columnDef.value),
+                  columnDef.enumValues
+                ),
+                color: displayColorForEnum(
+                  getValueWithApiKey(element, columnDef.value),
+                  columnDef.enumValues
+                )
+              }"
+            >
+              {{
+                displayValueForEnum(
+                  getValueWithApiKey(element, columnDef.value),
+                  columnDef.enumValues
+                )
+              }}
+            </span>
+            <!-- ========== ENUM TYPE VALUE END ========== -->
+
+            <!-- ========== ENUM ICON TYPE VALUE START ========== -->
+            <span *ngIf="columnDef.type === 'enum_icon'">
+              <ng-container
+                *ngIf="
+                  displayIconForEnum(
+                    getValueWithApiKey(element, columnDef.value),
+                    columnDef.enumIcons
+                  );
+                  else notValidEnumIcon
+                "
+              >
+                <can-icon
+                  [iconConfig]="
+                    displayIconForEnum(
+                      getValueWithApiKey(element, columnDef.value),
+                      columnDef.enumIcons
+                    )
+                  "
+                >
+                </can-icon>
+              </ng-container>
+
+              <!-- Invalid Enum Icon Value -->
+              <ng-template #notValidEnumIcon>
+                <span>-</span>
+              </ng-template>
+            </span>
+            <!-- ========== ENUM ICON TYPE VALUE END ========== -->
+          </td>
+        </ng-container>
+
+        <ng-container
+          *ngIf="fieldActionDefs && fieldActionDefs.length"
+          matColumnDef="action"
+          stickyEnd
+        >
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            [ngClass]="{
+              'left-align': tableConfig.alignment === 'left',
+              'right-align': tableConfig.alignment === 'right',
+              'center-align': tableConfig.alignment === 'center'
+            }"
+          >
+            ACTIONS
+          </th>
+          <td mat-cell *matCellDef="let element" class="field-action-icons">
+            <ng-container *ngIf="isSmallScreen">
+              <button
+                mat-icon-button
+                [matMenuTriggerFor]="menu"
+                aria-label="icon-button with a menu"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <ng-container *ngFor="let fieldActionDef of fieldActionDefs">
+                  <ng-container
+                    *canValidatePermission="fieldActionDef.action.permission"
+                  >
+                    <button
+                      mat-menu-item
+                      *ngIf="
+                        actionDisplayValidate(
+                          fieldActionDef.action.displayCondition,
+                          element
+                        )
+                      "
+                      (click)="applyFieldAction(element, fieldActionDef)"
+                    >
+                      <can-icon [iconConfig]="fieldActionDef.icon"></can-icon>
+                      <span>{{ fieldActionDef.icon.tooltip }}</span>
+                    </button>
+                  </ng-container>
+                </ng-container>
+              </mat-menu>
+            </ng-container>
+
+            <div *ngIf="!isSmallScreen" fxLayout="row wrap" fxLayoutGap="2px">
+              <span *ngFor="let fieldActionDef of fieldActionDefs">
+                <span *canValidatePermission="fieldActionDef.action.permission">
+                  <span
+                    *ngIf="
+                      actionDisplayValidate(
+                        fieldActionDef.action.displayCondition,
+                        element
+                      )
+                    "
+                    class="field-action-icon"
+                  >
+                    <can-icon
+                      [iconConfig]="fieldActionDef.icon"
+                      (click)="
+                        applyFieldAction(element, fieldActionDef, actionSpinner)
+                      "
+                      *ngIf="checkForActionVisiblity(actionSpinner)"
+                    ></can-icon>
+                    <mat-spinner [diameter]="18" #actionSpinner></mat-spinner>
+                  </span>
+                </span>
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+
+    <div *ngIf="tableDataSource?.filteredData?.length === 0" class="no-data">
+      <div
+        fxlayout="column"
+        fxlayoutalign="center center"
+        class="empty-container"
+      >
+        <img src="assets/images/empty-content.png" class="empty-container" />
+        <h3>Nothing found here. Try modifying the filters.</h3>
+      </div>
+    </div>
+
+    <!-- Table Paginator -->
+    <mat-paginator
+      [pageSizeOptions]="pageSizeOptions"
+      showFirstLastButtons
+      (page)="paginatorPageChange($event)"
+      [ngClass]="{ display: !tableConfig.pagination }"
+    ></mat-paginator>
+  </div>
+</div>

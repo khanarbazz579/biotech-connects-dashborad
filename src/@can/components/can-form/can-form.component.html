@@ -1,0 +1,962 @@
+<div
+  class="main-form-container"
+  [ngStyle]="{ 'max-width.%': formConfig.maxWidth ? formConfig.maxWidth : 100 }"
+>
+  <!-- Loader -->
+  <can-loader *ngIf="isLoad"></can-loader>
+  <!-- Loader -->
+
+  <!-- Header -->
+  <div *ngIf="header">
+    <h2>{{ header }}</h2>
+  </div>
+  <!-- Header -->
+
+  <!-- Form  -->
+  <form [formGroup]="form" *ngIf="form">
+    <!-- Form Fields with recursion for groups -->
+    <ng-container
+      *ngTemplateOutlet="
+        formFieldTemplate;
+        context: {
+          fields: formFields,
+          formGrp: form,
+          columnPerRow: columnPerRow
+        }
+      "
+    >
+    </ng-container>
+    <!-- Form Fields with recursion for groups -->
+  </form>
+  <!-- Form  -->
+  <!-- Form Buttons  -->
+  <div *ngIf="form" class="form-buttons">
+    <can-button
+      *ngIf="formButton"
+      [disabled]="
+        !form.valid ||
+        disableSubmitButton ||
+        (stepperForm ? !stepperForm : !form.dirty)
+      "
+      [buttonConfig]="formButton"
+      (onClick)="submitForm()"
+    ></can-button>
+
+    <can-button
+      *ngIf="backButton"
+      [buttonConfig]="backButton"
+      (onClick)="back()"
+      class="back-button"
+    ></can-button>
+  </div>
+  <!-- Form Buttons  -->
+</div>
+
+<!-- Form Fields -->
+<ng-template
+  #formFieldTemplate
+  let-fields="fields"
+  let-form="formGrp"
+  let-columnPerRow="columnPerRow"
+>
+  <div [formGroup]="form" class="form-container">
+    <ng-container *ngFor="let control of fields">
+      <div
+        *ngIf="
+          !control.isHidden &&
+          control.type !== 'hidden' &&
+          _displayValidate(control.displayCondition, form, control)
+        "
+        class="form-fields"
+        [ngStyle]="{ width: 100 / columnPerRow + '%' }"
+      >
+        <ng-container ngSwitch="{{ control.type }}">
+          <!-- Text -->
+          <mat-form-field
+            *ngSwitchCase="'text'"
+            [appearance]="control.outline ? 'outline' : 'standard'"
+          >
+            <mat-label
+              >{{ control.placeholder }}
+              <span *ngIf="control.required?.value"> *</span>
+            </mat-label>
+            <input
+              matInput
+              [formControlName]="control.name"
+              (ngModelChange)="formValueChange(control, form)"
+            />
+            <can-icon
+              matPrefix
+              *ngIf="control.prefixIcon"
+              [iconConfig]="control.prefixIcon"
+            ></can-icon>
+            <can-icon
+              matSuffix
+              *ngIf="control.suffixIcon"
+              [iconConfig]="control.suffixIcon"
+            ></can-icon>
+          </mat-form-field>
+          <!-- Text -->
+
+          <!-- Textarea -->
+          <mat-form-field
+            *ngSwitchCase="'textarea'"
+            [appearance]="control.outline ? 'outline' : 'standard'"
+          >
+            <mat-label
+              >{{ control.placeholder }}
+              <span *ngIf="control.required?.value"> *</span>
+            </mat-label>
+            <textarea
+              matInput
+              [maxlength]="control.maxlength"
+              [formControlName]="control.name"
+              (ngModelChange)="formValueChange(control, form)"
+            ></textarea>
+            <can-icon
+              matPrefix
+              *ngIf="control.prefixIcon"
+              [iconConfig]="control.prefixIcon"
+            ></can-icon>
+            <can-icon
+              matSuffix
+              *ngIf="control.suffixIcon"
+              [iconConfig]="control.suffixIcon"
+            ></can-icon>
+          </mat-form-field>
+          <!-- Textarea -->
+
+          <!-- Number -->
+          <mat-form-field
+            *ngSwitchCase="'number'"
+            [appearance]="control.outline ? 'outline' : 'standard'"
+          >
+            <mat-label
+              >{{ control.placeholder }}
+              <span *ngIf="control.required?.value"> *</span>
+            </mat-label>
+            <input
+              matInput
+              type="number"
+              [formControlName]="control.name"
+              (ngModelChange)="formValueChange(control, form)"
+            />
+            <can-icon
+              matPrefix
+              *ngIf="control.prefixIcon"
+              [iconConfig]="control.prefixIcon"
+            ></can-icon>
+            <can-icon
+              matSuffix
+              *ngIf="control.suffixIcon"
+              [iconConfig]="control.suffixIcon"
+            ></can-icon>
+          </mat-form-field>
+          <!-- Number -->
+
+          <!-- Password -->
+          <mat-form-field
+            *ngSwitchCase="'password'"
+            [appearance]="control.outline ? 'outline' : 'standard'"
+          >
+            <mat-label
+              >{{ control.placeholder }}
+              <span *ngIf="control.required?.value"> *</span>
+            </mat-label>
+            <input
+              matInput
+              type="password"
+              [formControlName]="control.name"
+              (ngModelChange)="formValueChange(control, form)"
+            />
+            <can-icon
+              matPrefix
+              *ngIf="control.prefixIcon"
+              [iconConfig]="control.prefixIcon"
+            ></can-icon>
+            <can-icon
+              matSuffix
+              *ngIf="control.suffixIcon"
+              [iconConfig]="control.suffixIcon"
+            ></can-icon>
+          </mat-form-field>
+          <!-- Password -->
+
+          <!-- Select -->
+          <mat-form-field
+            *ngSwitchCase="'select'"
+            [appearance]="control.outline ? 'outline' : 'standard'"
+          >
+            <mat-label
+              >{{ control.placeholder }}
+              <span *ngIf="control.required?.value"> *</span>
+            </mat-label>
+            <mat-select
+              [formControlName]="control.name"
+              [multiple]="
+                control.multipleSelect ? control.multipleSelect : false
+              "
+              (ngModelChange)="formValueChange(control, form)"
+            >
+              <mat-option
+                *ngFor="let each of control.values"
+                [value]="each.value"
+              >
+                {{ each.viewValue }}
+              </mat-option>
+            </mat-select>
+            <can-icon
+              matPrefix
+              *ngIf="control.prefixIcon"
+              [iconConfig]="control.prefixIcon"
+            ></can-icon>
+            <can-icon
+              matSuffix
+              *ngIf="control.suffixIcon"
+              [iconConfig]="control.suffixIcon"
+            ></can-icon>
+          </mat-form-field>
+          <!-- Select -->
+
+          <!-- Radio -->
+          <ng-container *ngSwitchCase="'radio'">
+            <label id="example-radio-group-label">{{
+              control.placeholder
+            }}</label>
+            <div>
+              <mat-radio-group
+                aria-label="Radio"
+                [formControlName]="control.name"
+                (ngModelChange)="formValueChange(control, form)"
+              >
+                <mat-radio-button
+                  [value]="each.value"
+                  *ngFor="let each of control.values"
+                >
+                  {{ each.viewValue }}
+                </mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </ng-container>
+          <!-- Radio -->
+
+          <!-- Checkbox -->
+          <ng-container *ngSwitchCase="'checkbox'">
+            <ng-container *ngIf="control.checkbox; else defaultCheckbox">
+              <mat-checkbox
+                (change)="
+                  $event.checked
+                    ? form.controls[control.name].setValue(
+                        control.checkbox.activeValue
+                      )
+                    : form.controls[control.name].setValue(
+                        control.checkbox.inActiveValue
+                      );
+                  formValueChange(control, form)
+                "
+                [checked]="
+                  form.controls[control.name].value ===
+                  control.checkbox.activeValue
+                "
+                [disabled]="control.disabled"
+              >
+                {{ control.placeholder }}
+              </mat-checkbox>
+            </ng-container>
+            <ng-template #defaultCheckbox>
+              <mat-checkbox
+                [formControlName]="control.name"
+                (ngModelChange)="formValueChange(control, form)"
+              >
+                {{ control.placeholder }}
+              </mat-checkbox>
+            </ng-template>
+          </ng-container>
+          <!-- Checkbox -->
+
+          <!-- Multiple Select Checkbox -->
+          <div
+            *ngSwitchCase="'multicheckbox'"
+            fxLayout="row"
+            fxLayoutGap="14px"
+            class="multi-checkbox"
+          >
+            <div class="label" fxFlex="30%">
+              {{ control.placeholder }}
+            </div>
+            <div
+              fxLayout="row wrap"
+              fxFlex="70%"
+              fxLayoutAlign="space-between center"
+            >
+              <ng-container *ngFor="let each of control.values">
+                <mat-checkbox
+                  (change)="
+                    multiSelectCheckboxChange(each, control, form);
+                    formValueChange(control, form)
+                  "
+                  [checked]="isMultiCheckboxFieldChecked(each, control, form)"
+                  [disabled]="control.disabled"
+                  [disableRipple]="true"
+                >
+                  {{ each.viewValue }}
+                </mat-checkbox>
+              </ng-container>
+            </div>
+          </div>
+          <!-- Multiple Select Checkbox -->
+
+          <!-- Date -->
+          <ng-container *ngSwitchCase="'date'">
+            <mat-form-field
+              [appearance]="control.outline ? 'outline' : 'standard'"
+            >
+              <mat-label
+                >{{ control.placeholder }}
+                <span *ngIf="control.required?.value"> *</span>
+              </mat-label>
+              <input
+                matInput
+                [owlDateTime]="dt"
+                [formControlName]="control.name"
+                [owlDateTimeTrigger]="dt"
+                [selectMode]="control.date?.enabledRange ? 'range' : 'single'"
+                [min]="
+                  control.date?.dateRange?.minDate
+                    ? control.date.dateRange.minDate
+                    : undefined
+                "
+                [max]="
+                  control.date?.dateRange?.maxDate
+                    ? control.date.dateRange.maxDate
+                    : undefined
+                "
+                (ngModelChange)="formValueChange(control, form)"
+              />
+
+              <can-icon
+                matPrefix
+                *ngIf="control.prefixIcon"
+                [iconConfig]="control.prefixIcon"
+                [owlDateTimeTrigger]="dt"
+              ></can-icon>
+              <can-icon
+                matSuffix
+                *ngIf="control.suffixIcon"
+                [iconConfig]="control.suffixIcon"
+                [owlDateTimeTrigger]="dt"
+              ></can-icon>
+            </mat-form-field>
+            <owl-date-time
+              #dt
+              [pickerType]="control.date?.enabledTime ? 'both' : 'calendar'"
+            ></owl-date-time>
+          </ng-container>
+          <!-- Date -->
+
+          <!-- Time -->
+          <ng-container *ngSwitchCase="'time'">
+            <mat-form-field
+              [appearance]="control.outline ? 'outline' : 'standard'"
+            >
+              <mat-label
+                >{{ control.placeholder }}
+                <span *ngIf="control.required?.value"> *</span>
+              </mat-label>
+              <input
+                matInput
+                [owlDateTime]="timePicker"
+                [formControlName]="control.name"
+                [owlDateTimeTrigger]="timePicker"
+                (ngModelChange)="formValueChange(control, form)"
+              />
+
+              <can-icon
+                matPrefix
+                *ngIf="control.prefixIcon"
+                [iconConfig]="control.prefixIcon"
+                [owlDateTimeTrigger]="timePicker"
+              ></can-icon>
+              <can-icon
+                matSuffix
+                *ngIf="control.suffixIcon"
+                [iconConfig]="control.suffixIcon"
+                [owlDateTimeTrigger]="timePicker"
+              ></can-icon>
+            </mat-form-field>
+            <owl-date-time #timePicker [pickerType]="'timer'"></owl-date-time>
+          </ng-container>
+          <!-- Time -->
+
+          <!-- Toggle -->
+          <div *ngSwitchCase="'toggle'" class="toggle">
+            <mat-label
+              >{{ control.placeholder }}
+              <span *ngIf="control.required?.value"> *</span>
+            </mat-label>
+            <ng-container *ngIf="control.checkbox; else defaultCheckbox">
+              <mat-slide-toggle
+                (change)="
+                  $event.checked
+                    ? form.controls[control.name].setValue(
+                        control.checkbox.activeValue
+                      )
+                    : form.controls[control.name].setValue(
+                        control.checkbox.inActiveValue
+                      );
+                  formValueChange(control, form)
+                "
+                [checked]="
+                  form.controls[control.name].value ===
+                  control.checkbox.activeValue
+                "
+                [disabled]="control.disabled"
+              ></mat-slide-toggle>
+            </ng-container>
+            <ng-template #defaultCheckbox>
+              <mat-slide-toggle
+                [formControlName]="control.name"
+                (ngModelChange)="formValueChange(control, form)"
+              >
+              </mat-slide-toggle>
+            </ng-template>
+          </div>
+          <!-- Toggle -->
+
+          <!-- Rich Text Editor -->
+          <ng-container *ngSwitchCase="'rich-textarea'">
+            {{ control.placeholder }}
+            <div class="ql-rich-text">
+              <quill-editor
+                theme="snow"
+                [modules]="quillToolbarOptions"
+                [formControlName]="control.name"
+                style="height: 250px; width: 100px;"
+                (ngModelChange)="formValueChange(control, form)"
+              >
+              </quill-editor>
+            </div>
+          </ng-container>
+          <!-- Rich Text Editor -->
+
+          <!-- Autocomplete -->
+          <span *ngSwitchCase="'autocomplete'" class="autocomplete-container">
+            <ng-container *ngIf="control.autoComplete.type === 'local'">
+              <mat-form-field
+                [appearance]="control.outline ? 'outline' : 'standard'"
+              >
+                <mat-label
+                  >{{ control.placeholder }}
+                  <span *ngIf="control.required?.value"> *</span>
+                </mat-label>
+                <input
+                  type="text"
+                  matInput
+                  [matAutocomplete]="auto"
+                  [(ngModel)]="control.autoComplete.autocompleteSearchText"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="control.disabled"
+                />
+                <can-icon
+                  matPrefix
+                  *ngIf="control.prefixIcon"
+                  [iconConfig]="control.prefixIcon"
+                >
+                </can-icon>
+                <can-icon
+                  matSuffix
+                  *ngIf="control.suffixIcon"
+                  [iconConfig]="control.suffixIcon"
+                >
+                </can-icon>
+              </mat-form-field>
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                (optionSelected)="
+                  setValueToAutocomplete($event.option.value, control, form);
+                  formValueChange(control, form)
+                "
+              >
+                <mat-option
+                  *ngFor="
+                    let option of control.values
+                      | filterList: control.autoComplete.autocompleteSearchText
+                  "
+                  [value]="option"
+                  >{{ option.viewValue }}</mat-option
+                >
+              </mat-autocomplete>
+            </ng-container>
+            <ng-container *ngIf="control.autoComplete.type === 'api'">
+              <mat-form-field
+                [appearance]="control.outline ? 'outline' : 'standard'"
+              >
+                <mat-label
+                  >{{ control.placeholder }}
+                  <span *ngIf="control.required?.value"> *</span>
+                </mat-label>
+                <input
+                  type="text"
+                  matInput
+                  [(ngModel)]="control.autoComplete.autocompleteSearchText"
+                  [ngModelOptions]="{ standalone: true }"
+                  [matAutocomplete]="auto"
+                  (ngModelChange)="
+                    getAutocompletes(control, form, autoCompletespinner)
+                  "
+                  [disabled]="control.disabled"
+                />
+                <mat-spinner #autoCompletespinner [diameter]="15"></mat-spinner>
+                <can-icon
+                  matPrefix
+                  *ngIf="control.prefixIcon"
+                  [iconConfig]="control.prefixIcon"
+                >
+                </can-icon>
+                <can-icon
+                  matSuffix
+                  *ngIf="control.suffixIcon"
+                  [iconConfig]="control.suffixIcon"
+                >
+                </can-icon>
+              </mat-form-field>
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                (optionSelected)="
+                  setValueToAutocomplete($event.option.value, control, form);
+                  formValueChange(control, form)
+                "
+              >
+                <mat-option
+                  *ngFor="let option of control.values"
+                  [value]="option"
+                  >{{ option.viewValue }}
+                </mat-option>
+              </mat-autocomplete>
+            </ng-container>
+          </span>
+          <!-- Autocomplete -->
+
+          <!-- Image -->
+          <span *ngSwitchCase="'image'" class="image-container">
+            <mat-form-field
+              floatLabel="never"
+              [appearance]="control.outline ? 'outline' : 'standard'"
+            >
+              <mat-label
+                >{{ control.placeholder }}
+                <span *ngIf="control.required?.value"> *</span>
+              </mat-label>
+              <ngx-mat-file-input
+                [accept]="control.file.acceptType"
+                [multiple]="control.file.multipleSelect"
+                (change)="
+                  upload($event, control, imageSpinner, removableInput, form)
+                "
+                [disabled]="
+                  control.disabled ||
+                  (control.file.limit &&
+                    form.controls[control.name].value &&
+                    form.controls[control.name].value.length ===
+                      control.file.limit)
+                "
+                #removableInput
+              >
+              </ngx-mat-file-input>
+              <div
+                class="images"
+                fxLayout="row"
+                fxLayoutAlign="start none"
+                fxLayoutGap="20px"
+                *ngIf="form.controls[control.name].value"
+              >
+                <ng-container
+                  *ngIf="
+                    control.file.multipleSelect &&
+                    _.isArray(form.controls[control.name].value) &&
+                    form.controls[control.name].value.length
+                  "
+                >
+                  <div
+                    fxFlex
+                    *ngFor="
+                      let eachPath of form.controls[control.name].value;
+                      let imgIndex = index
+                    "
+                    class="image-element"
+                  >
+                    <img [src]="eachPath" alt="img" />
+                    <mat-icon
+                      class="clear-icon"
+                      (click)="
+                        removeFile($event, control, imgIndex, form);
+                        formValueChange(control, form)
+                      "
+                    >
+                      clear
+                    </mat-icon>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="!control.file.multipleSelect">
+                  <div
+                    fxFlex
+                    class="image-element"
+                    *ngIf="form.controls[control.name].value"
+                  >
+                    <img [src]="form.controls[control.name].value" alt="img" />
+                    <mat-icon
+                      class="clear-icon"
+                      (click)="
+                        $event.stopPropagation();
+                        form.controls[control.name].setValue(undefined);
+                        formValueChange(control, form)
+                      "
+                    >
+                      clear
+                    </mat-icon>
+                  </div>
+                </ng-container>
+              </div>
+              <mat-spinner [diameter]="15" #imageSpinner></mat-spinner>
+              <can-icon
+                matPrefix
+                *ngIf="control.prefixIcon"
+                [iconConfig]="control.prefixIcon"
+              ></can-icon>
+              <can-icon
+                matSuffix
+                *ngIf="control.suffixIcon"
+                [iconConfig]="control.suffixIcon"
+              ></can-icon>
+            </mat-form-field>
+          </span>
+          <!-- Image -->
+
+          <!-- Document -->
+          <span *ngSwitchCase="'document'" class="document-container">
+            <mat-form-field
+              floatLabel="never"
+              [appearance]="control.outline ? 'outline' : 'standard'"
+            >
+              <mat-label
+                >{{ control.placeholder }}
+                <span *ngIf="control.required?.value"> *</span>
+              </mat-label>
+              <ngx-mat-file-input
+                [accept]="control.file.acceptType"
+                [multiple]="control.file.multipleSelect"
+                (change)="
+                  upload($event, control, docSpinner, removableInput, form)
+                "
+                [disabled]="
+                  control.disabled ||
+                  (control.file.limit &&
+                    form.controls[control.name].value &&
+                    form.controls[control.name].value.length ===
+                      control.file.limit)
+                "
+                #removableInput
+              >
+              </ngx-mat-file-input>
+              <div class="documents">
+                <ng-container *ngIf="form.controls[control.name].value">
+                  <ng-container
+                    *ngIf="
+                      control.file.multipleSelect &&
+                      _.isArray(form.controls[control.name].value) &&
+                      form.controls[control.name].value.length
+                    "
+                  >
+                    <span
+                      *ngFor="
+                        let eachPath of form.controls[control.name].value;
+                        let docIndex = index
+                      "
+                    >
+                      <a target="_blank" [href]="eachPath">
+                        <mat-icon class="doc">description</mat-icon>
+                      </a>
+                      <mat-icon
+                        class="clear-icon"
+                        (click)="
+                          removeFile($event, control, docIndex, form);
+                          formValueChange(control, form)
+                        "
+                      >
+                        clear
+                      </mat-icon>
+                    </span>
+                  </ng-container>
+
+                  <ng-container *ngIf="!control.file.multipleSelect">
+                    <span *ngIf="form.controls[control.name].value">
+                      <a
+                        target="_blank"
+                        [href]="form.controls[control.name].value"
+                      >
+                        <mat-icon class="doc">description</mat-icon>
+                      </a>
+                      <mat-icon
+                        class="clear-icon"
+                        (click)="
+                          $event.stopPropagation();
+                          form.controls[control.name].setValue(undefined);
+                          formValueChange(control, form)
+                        "
+                      >
+                        clear
+                      </mat-icon>
+                    </span>
+                  </ng-container>
+                </ng-container>
+              </div>
+              <mat-spinner [diameter]="15" #docSpinner></mat-spinner>
+              <can-icon
+                matPrefix
+                *ngIf="control.prefixIcon"
+                [iconConfig]="control.prefixIcon"
+              ></can-icon>
+              <can-icon
+                matSuffix
+                *ngIf="control.suffixIcon"
+                [iconConfig]="control.suffixIcon"
+              ></can-icon>
+            </mat-form-field>
+          </span>
+          <!-- Document -->
+
+          <!-- Tags/Chips -->
+          <ng-container *ngSwitchCase="'tags'">
+            <mat-form-field
+              class="tags-container"
+              [appearance]="control.outline ? 'outline' : 'standard'"
+            >
+              <mat-label
+                >{{ control.placeholder }}
+                <span *ngIf="control.required?.value"> *</span>
+              </mat-label>
+              <mat-chip-list #chipList aria-label="tag selection">
+                <!-- Tags type Default -->
+                <ng-container *ngIf="control.tags.type === 'default'">
+                  <ng-container
+                    *ngIf="
+                      form.controls[control.name].value &&
+                      _.isArray(form.controls[control.name].value)
+                    "
+                  >
+                    <mat-chip
+                      *ngFor="
+                        let each of form.controls[control.name].value;
+                        let index = index
+                      "
+                      (removed)="
+                        form.controls[control.name].value.splice(index, 1);
+                        formValueChange(control, form)
+                      "
+                    >
+                      {{ each }}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                  </ng-container>
+                  <input
+                    [matChipInputFor]="chipList"
+                    (matChipInputTokenEnd)="
+                      addTags($event, control, form);
+                      formValueChange(control, form)
+                    "
+                    [disabled]="control.disabled"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  />
+                </ng-container>
+                <!-- Tags type Default -->
+
+                <!-- Tags type Select -->
+                <ng-container *ngIf="control.tags.type === 'select'">
+                  <ng-container
+                    *ngIf="
+                      form.controls[control.name].value &&
+                      _.isArray(form.controls[control.name].value)
+                    "
+                  >
+                    <mat-chip
+                      *ngFor="
+                        let each of form.controls[control.name].value;
+                        let index = index
+                      "
+                      (removed)="
+                        form.controls[control.name].value.splice(index, 1);
+                        formValueChange(control, form)
+                      "
+                    >
+                      {{ getDisplayValueForTags(each, control.values) }}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                  </ng-container>
+                  <input
+                    [matChipInputFor]="chipList"
+                    [matAutocomplete]="auto"
+                    #autocompleteTags
+                    [disabled]="control.disabled"
+                  />
+                  <mat-autocomplete
+                    #auto="matAutocomplete"
+                    (optionSelected)="
+                      addTagsFromAutocomplete(
+                        $event.option.value,
+                        control,
+                        autocompleteTags,
+                        form
+                      );
+                      formValueChange(control, form)
+                    "
+                  >
+                    <mat-option
+                      *ngFor="
+                        let option of getDisplayOptionsForTags(
+                          control.values,
+                          form.controls[control.name].value
+                        ) | filterList: autocompleteTags.value
+                      "
+                      [value]="option.value"
+                    >
+                      {{ option.viewValue }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </ng-container>
+                <!-- Tags type Select -->
+              </mat-chip-list>
+              <can-icon
+                matPrefix
+                *ngIf="control.prefixIcon"
+                [iconConfig]="control.prefixIcon"
+              ></can-icon>
+              <can-icon
+                matSuffix
+                *ngIf="control.suffixIcon"
+                [iconConfig]="control.suffixIcon"
+              ></can-icon>
+            </mat-form-field>
+          </ng-container>
+
+          <!-- Tags/Chips -->
+
+          <!-- Groups -->
+          <ng-container *ngSwitchCase="'group'">
+            <div [formGroupName]="control.name">
+              <div *ngIf="control.placeholder">
+                <h3>{{ control.placeholder }}</h3>
+              </div>
+              <ng-container
+                *ngTemplateOutlet="
+                  formFieldTemplate;
+                  context: {
+                    fields: control.formFields,
+                    formGrp: form.controls[control.name],
+                    columnPerRow: control.columnPerRow || 1
+                  }
+                "
+              >
+              </ng-container>
+            </div>
+          </ng-container>
+          <!-- Groups -->
+
+          <!-- Form Array -->
+          <ng-container *ngSwitchCase="'array'">
+            <div *ngIf="control.placeholder">
+              <h3>{{ control.placeholder }}</h3>
+            </div>
+            <div
+              [formArrayName]="control.name"
+              *ngFor="
+                let each of form.controls[control.name].controls;
+                let i = index
+              "
+            >
+              <ng-container
+                *ngTemplateOutlet="
+                  formFieldTemplate;
+                  context: {
+                    fields: control.formFields,
+                    formGrp: form.controls[control.name].controls[i],
+                    columnPerRow: control.columnPerRow || 1
+                  }
+                "
+              >
+              </ng-container>
+              <div
+                *ngIf="
+                  control.formArray?.deleteButton &&
+                  (form.controls[control.name].controls.length === 1
+                    ? control.formArray?.deleteLastElement
+                    : true)
+                "
+              >
+                <can-button
+                  [buttonConfig]="control.formArray.deleteButton"
+                  (onClick)="form.controls[control.name].removeAt(i); formValueChanges.emit(form.value)"
+                ></can-button>
+              </div>
+            </div>
+            <div *ngIf="control.formArray?.addButton">
+              <can-button
+                [buttonConfig]="control.formArray.addButton"
+                (onClick)="addNewToFormArray(form, control)"
+              ></can-button>
+            </div>
+          </ng-container>
+          <!-- Form Array -->
+
+          <!-- Validation Errors -->
+          <ng-container>
+            <div
+              *ngIf="
+                form.controls[control.name] &&
+                form.controls[control.name].invalid &&
+                form.controls[control.name].errors &&
+                (form.controls[control.name].dirty ||
+                  form.controls[control.name].touched)
+              "
+            >
+              <mat-error *ngIf="form.controls[control.name].errors.required">
+                {{ control.required.errorMessage }}
+              </mat-error>
+              <mat-error *ngIf="form.controls[control.name].errors.pattern">
+                {{ control.pattern.errorMessage }}
+              </mat-error>
+              <mat-error
+                *ngIf="form.controls[control.name].errors.relativeEqual"
+              >
+                {{
+                  form.controls[control.name].errors.relativeEqual
+                }}</mat-error
+              >
+              <mat-error
+                *ngIf="form.controls[control.name].errors.relativeNotEqual"
+              >
+                {{
+                  form.controls[control.name].errors.relativeNotEqual
+                }}</mat-error
+              >
+              <mat-error *ngIf="form.controls[control.name].errors.relativeMin">
+                {{ form.controls[control.name].errors.relativeMin }}</mat-error
+              >
+              <mat-error *ngIf="form.controls[control.name].errors.relativeMax">
+                {{ form.controls[control.name].errors.relativeMax }}</mat-error
+              >
+              <mat-error
+                *ngIf="form.controls[control.name].errors.asyncValidationError"
+              >
+                {{
+                  form.controls[control.name].errors.asyncValidationError
+                }}</mat-error
+              >
+            </div>
+          </ng-container>
+          <!-- Validation Errors -->
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+<!-- Form Fields -->

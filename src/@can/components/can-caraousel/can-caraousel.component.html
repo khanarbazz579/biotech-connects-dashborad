@@ -1,0 +1,9 @@
+<div class="main-carausol-container">
+    <div class="carausol-container" #carousel>
+        <img *ngFor="let image of imagesData;let i=index" [src]="image.image.src">
+    </div>
+    <mat-icon class="previous-image-selector" (click)="previous()" *ngIf="currentIndex !== 0">
+        navigate_before</mat-icon>
+    <mat-icon class="next-image-selector" (click)="next()" *ngIf="currentIndex !== imagesData.length-1">navigate_next
+    </mat-icon>
+</div>

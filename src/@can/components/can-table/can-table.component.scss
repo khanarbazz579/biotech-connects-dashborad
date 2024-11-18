@@ -1,0 +1,161 @@
+.main-container {
+  position: relative;
+  min-height: 160px;
+  padding: 15px;
+  
+  .page-loader-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bulk-actions {
+    padding: 10px;
+  }
+  .filters {
+    .date-picker-icon {
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .dateRange {
+      padding: 10px;
+    }
+
+    .filter-spinner{
+      display: none;
+    }
+
+    .clear-icon {
+      margin: 13px -14px;
+      color: #e60000;
+      background: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    .filter-clear-icon {
+      z-index: 1;
+    }
+  }
+  .hide-table {
+    display: none
+  }
+  .empty-container{
+    width: 10vw;
+    margin: 0 auto;
+  }
+  .table-container {
+    position: relative;
+    overflow: auto;
+    table {
+      width: 100%;
+      a {
+        color: #3e51b5;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .warn {
+        color: red;
+      }
+      td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
+        max-width: 175px;
+        padding-left: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .field-action-icons {
+        white-space: normal !important;
+        .field-action-icon {
+          margin-right: 4%;
+  
+          .mat-progress-spinner {
+            display: none;
+          }
+        }  
+      }
+      .inline-images {
+        overflow: auto;
+
+        img {
+          max-height: 44px; 
+          max-width: 44px; 
+          border-radius:3px;
+        }
+      }
+
+      .inline-image{
+        max-height: 44px; 
+        max-width: 44px; 
+        border-radius:3px;
+        vertical-align:middle;
+      }
+    }
+
+    .left-align {
+      text-align: left;
+    }
+
+    .right-align {
+      text-align: right;
+    }
+
+    .center-align {
+      text-align: center;
+    }
+  }
+
+  .no-data {
+    text-align: center;
+    font-size: 14px;
+    margin: 10px;
+  }
+
+  .display {
+    display: none;
+  }
+
+  .sentenceCase {
+    text-transform: capitalize;
+  }
+
+  .lowercase {
+    text-transform: lowercase;
+  }
+  .word-wrap{
+    white-space: break-spaces !important;
+    word-wrap: break-word;
+    }
+}
+
+.scroll-container {
+  max-height: 89vh; 
+  overflow: scroll;
+}
+
+.disable-container {
+  overflow: hidden;
+}
+
+::ng-deep {
+    .mat-menu-item {
+      .flat-icon-custom:before {
+        margin-right: 16px;
+        vertical-align: sub;
+      }
+    }
+}
+
+
+.sku-table .mat-elevation-z3 {
+  box-shadow: none!important;
+}

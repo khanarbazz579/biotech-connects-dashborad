@@ -1,0 +1,7 @@
+<span *ngIf="iconConfig" #iconContent>
+    <mat-icon *ngIf="iconConfig.type !== CanIconType.Flaticon" class="mat-icon-custom"
+        [matTooltip]="iconConfig.tooltip">{{ iconConfig.name }}</mat-icon>
+    <i *ngIf="iconConfig.type === CanIconType.Flaticon" [ngClass]="[iconConfig.name,'flat-icon-custom']"
+        [matTooltip]="iconConfig.tooltip"></i>
+</span>
+

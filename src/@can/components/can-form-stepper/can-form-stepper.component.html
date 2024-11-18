@@ -1,0 +1,53 @@
+<div>
+  <can-loader *ngIf="isLoad" style="min-height: 100px;"></can-loader>
+  <div *ngIf="showFormStepper">
+    <div *ngIf="header">
+      <h2>{{ header }}</h2>
+    </div>
+    <mat-horizontal-stepper
+      #stepper
+      [labelPosition]="labelPosition || 'end'"
+      [selectedIndex]="selectedIndex"
+      *ngIf="layout === CanFormStepperLayout.Horizontal"
+    >
+      <mat-step
+        *ngFor="let step of steps; let i = index"
+        [stepControl]="stepperForm.form || defaultFormGroup"
+        [editable]="true"
+      >
+        <ng-template matStepLabel>{{ step.label }}</ng-template>
+        <can-form
+          [formConfig]="step.form"
+          [stepperForm]="true"
+          #stepperForm
+          (getData)="next($event, stepperForm, i)"
+          [backButton]="i === 0 ? undefined : formStepperConfig.backButton"
+          (backButtonClick)="backClicked(stepperForm.form)"
+        >
+        </can-form>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <mat-vertical-stepper
+      #stepper
+      [selectedIndex]="selectedIndex"
+      *ngIf="layout === CanFormStepperLayout.Vertical"
+    >
+      <mat-step
+        *ngFor="let step of steps; let i = index"
+        [stepControl]="stepperForm.form || defaultFormGroup"
+        [editable]="true"
+      >
+        <ng-template matStepLabel>{{ step.label }}</ng-template>
+        <can-form
+          [formConfig]="step.form"
+          [stepperForm]="true"
+          #stepperForm
+          (getData)="next($event, stepperForm, i)"
+          [backButton]="i === 0 ? undefined : formStepperConfig.backButton"
+          (backButtonClick)="backClicked(stepperForm.form)"
+        >
+        </can-form>
+      </mat-step>
+    </mat-vertical-stepper>
+  </div>
+</div>

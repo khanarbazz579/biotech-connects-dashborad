@@ -1,0 +1,13 @@
+<div class="modal-container">
+    <div class="right-action-button">
+        <button mat-icon-button matTooltip="Close Modal" color="warn" (click)="closeModal()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div class="modal-header" *ngIf="header">
+        <h2>{{header}}</h2>
+    </div>
+    <div #displayComponent></div>
+    <can-modal-footer *ngIf="footer" [footer]="footer" [dataSource]="dataSource" (reloadContent)="reloadContent($event)"
+        (closeModal)="closeModalFromFooter($event)"></can-modal-footer>
+</div>

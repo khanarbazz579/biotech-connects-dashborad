@@ -1,0 +1,3 @@
+<!-- 
+<can-form-stepper [formStepperConfig]="formStepperConfig" (formSubmitted)="formSubmitted($event)"></can-form-stepper> -->
+<can-form [formConfig]="formData" (formSubmitted)="formSubmitted($event)" (getData)="FormSubmitResponse($event)"></can-form>

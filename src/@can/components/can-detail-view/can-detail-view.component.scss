@@ -1,0 +1,100 @@
+.main-container {
+    position: relative;
+    margin: 16px 0px 0px 0px;
+    width: auto;
+    overflow-wrap: break-word;
+    .header-container{
+        display: flex;
+
+        .heading {
+            width: -webkit-fill-available;
+            // background-color: #ebebeb;
+            padding: 0px 16px 0px 16px;
+        }
+        .heading h2{
+            float: left;
+        }
+        .action-icon {
+            padding-top: 12px;
+            cursor: pointer;
+            float: right;
+        }
+    }
+    .details-container {
+        font-size: 15px;
+        // text-align: center;
+        display: table;
+        width: -webkit-fill-available;
+        .fields {
+            float: left;            
+            .field {
+                padding-bottom: 16px;
+                margin-bottom: 8px;
+            }
+            .field-top {
+                width: 100%;    
+            }
+            .group-header {
+                font-size: 17px;
+                padding: 16px 0px 16px 0px;
+                color: #000000;
+
+            }
+
+            .field-inline {
+                width: 50%;
+                float: left;
+                font-size: 15px;
+            }
+        }
+        .field-header {
+            font-weight: bold;
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+        .field-value-top{
+            border-top: 1px dashed #b1b0b0;
+        }
+        .mat-icon-button{
+            width: auto;
+        }
+        .mat-grid-tile {
+            overflow: scroll;
+        }
+        .mat-figure {
+            display: grid !important;
+        }
+        .inline-images {
+            overflow: auto;
+    
+            img {
+              max-height: 44px; 
+              max-width: 44px; 
+              border-radius:3px;
+            }
+        }
+    
+    }
+    .sentenceCase {
+        text-transform: capitalize;
+    }
+}
+
+::ng-deep {
+    .details-container {
+        padding-bottom: 24px;
+        margin: 16px;
+
+        .mat-figure {
+            display: grid !important;
+        }
+        .mat-icon-button {
+            height: auto !important;
+            line-height: 0 !important;
+            .mat-button, .mat-flat-button, .mat-icon-button, .mat-stroked-button {
+              line-height: 0 !important;
+            }
+        }
+    }
+}

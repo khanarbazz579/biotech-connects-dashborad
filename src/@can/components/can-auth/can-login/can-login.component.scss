@@ -1,0 +1,21 @@
+.login-wrapper {
+  height: 100%;
+  .login-container {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    height: 100%;
+    .logo {
+      margin-bottom: 20px;
+      img {
+        max-width: 130px;
+      }
+    }
+    .error {
+      text-align: start;
+      margin-top: -10px;
+      margin-bottom: 8px;
+    }  
+  }
+}

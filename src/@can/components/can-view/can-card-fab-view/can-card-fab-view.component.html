@@ -1,0 +1,6 @@
+<h1 *ngIf="header">{{header}}</h1>
+
+<!-- Display Any Component / HTML from Parent Component -->
+<can-card-view [cardViewConfig]="cardViewConfig" *ngIf="cardViewConfig && displayCardView"></can-card-view>
+<can-fab-button *ngIf="fabButtonConfig" [fabButtonConfig]="fabButtonConfig"
+    (fabButtonOutputEvent)="reloadContent($event)"></can-fab-button>

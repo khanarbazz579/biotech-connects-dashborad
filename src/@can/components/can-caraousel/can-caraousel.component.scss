@@ -1,0 +1,29 @@
+.main-carausol-container{
+    position: relative;
+    overflow: hidden;
+    .carausol-container{
+        width: 100%; 
+        height:100%;
+        display: flex;
+        transition-duration: 250ms;
+
+        img {
+            width: 100%; 
+        }
+    }
+    mat-icon {
+        user-select: none;
+        font-size: 44px;
+        top: 36%;
+        position: absolute;
+        cursor: pointer;
+        color: #bbb7b7;
+        z-index: 999999;
+ }
+    .next-image-selector{
+        right: 9%;
+    }
+    .previous-image-selector{
+        left: 0%;    
+    }
+}

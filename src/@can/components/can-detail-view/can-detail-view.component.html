@@ -1,0 +1,265 @@
+<div class="main-container" *ngIf="displayDetailView"
+    [ngClass]="[detailViewConfig.elevation === undefined ? 'mat-elevation-z3':   'mat-elevation-z' +detailViewConfig.elevation]">
+    <!-- Loader -->
+    <can-loader *ngIf="isLoad"></can-loader>
+
+    <!-- Header -->
+    <div class="header-container">
+        <!-- Header Name -->
+        <div class="heading" *ngIf="header || actionDef">
+            <h2>{{header}}</h2>
+            <ng-container *ngIf="actionDef">
+                <div *ngFor="let action of actionDef">
+                    <div *canValidatePermission="action.action.permission" class="action-icon">
+                        <can-icon [iconConfig]="action.icon" (click)="applyAction(action.action)"
+                            *ngIf="displayValidate(action.action.displayCondition)"></can-icon>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <!-- Header Name -->
+        <!-- Header Action Button -->
+
+        <!-- Header Action Button -->
+    </div>
+    <!-- Header -->
+
+    <!-- Handle Grouping of fields in recursive mode -->
+    <div class="details-container" *ngIf="dataSource && displayedFieldDefs && displayedFieldDefs.length">
+        <ng-container
+            *ngTemplateOutlet="detailViewTemplate;context:{displayedFieldDefs:displayedFieldDefs, columnPerRow: columnPerRow, labelPosition: detailViewConfig.labelPosition, data: dataSource}">
+        </ng-container>
+    </div>
+    <!-- Handle Grouping of fields in recursive mode -->
+
+    <!-- Displaying Value -->
+    <ng-template #detailViewTemplate let-displayedFieldDefs="displayedFieldDefs" let-columnPerRow="columnPerRow"
+        let-labelPosition="labelPosition" let-data="data">
+        <ng-container *ngFor="let element of displayedFieldDefs; let index = index">
+            <div class="fields" [ngStyle]="{'width': isSmallScreen ? '100%' : (100/columnPerRow) + '%'}"
+                *ngIf="displayValidate(element.displayCondition)">
+                <div class="field-top" [ngClass]="{'field': element.type!=='group' && element.type!=='api_group'}">
+                    <div class="field-header" *ngIf="element.header && element.type!=='api_group'"
+                        [ngClass]="{'group-header': element.type==='group', 'field-inline': element.type!=='group' && ((!isSmallScreen && labelPosition === 'inline') || (isSmallScreen && labelPosition === 'inline' && columnPerRow === 1)) }">
+                        {{element.header}}
+                    </div>
+                    <div
+                        [ngClass]="{'field-inline': element.type!=='group' && element.type!=='api_group' && ((!isSmallScreen && labelPosition === 'inline') || (isSmallScreen && labelPosition === 'inline' && columnPerRow === 1)) }">
+                        <!-- ========== TEXT TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'text'" class="sentenceCase">
+                            {{ getValueWithApiKey(data, element.value, element.keySeparators) }}
+                        </span>
+                        <!-- ========== TEXT TYPE VALUE END ========== -->
+
+                        <!-- ========== BOOLEAN TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'boolean'">
+                            <!-- Valid Boolean -->
+                            <span *ngIf="_.isBoolean(getValueWithApiKey(data, element.value));
+                                        else notValidBoolean
+                                      ">
+                                <!-- Boolean Property Defined -->
+                                <span *ngIf="element.boolean; else notValidBoolean">
+                                    {{
+                                        getValueWithApiKey(data, element.value)
+                                            ? element.boolean.trueValue
+                                            : element.boolean.falseValue
+                                        }}
+                                </span>
+                            </span>
+
+                            <!-- Inavlid Boolean or Boolean Property not defined -->
+                            <ng-template #notValidBoolean>
+                                {{ getValueWithApiKey(data, element.value) }}
+                            </ng-template>
+                        </span>
+                        <!-- ========== BOOLEAN TYPE VALUE END ========== -->
+
+                        <!-- ========== NUMBER TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'number'">
+                            {{
+                          _.isNumber(getValueWithApiKey(data, element.value))
+                            ? (getValueWithApiKey(data, element.value) | number)
+                            : getValueWithApiKey(data, element.value)
+                        }}
+                        </span>
+                        <!-- ========== NUMBER TYPE VALUE END ========== -->
+
+                        <!-- ========== CURRENCY TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'currency'">
+                            {{
+                          _.isNumber(getValueWithApiKey(data, element.value))
+                            ? (getValueWithApiKey(data, element.value)
+                              | currency: "INR":"symbol")
+                            : getValueWithApiKey(data, element.value)
+                        }}
+                        </span>
+                        <!-- ========== CURRENCY TYPE VALUE END ========== -->
+
+                        <!-- ========== DATE TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'date'">
+                            {{
+                          getValueWithApiKey(data, element.value) !== "-"
+                            ? (getValueWithApiKey(data, element.value) | date:(element.dateDisplayType || 'dd/MM/yy hh:mm:ss'))
+                            : getValueWithApiKey(data, element.value)
+                        }}
+                        </span>
+                        <!-- ========== DATE TYPE VALUE END ========== -->
+
+                        <!-- ========== IMAGE TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'image'">
+                            <ng-container *ngIf="!element.images.showAll">
+                                <button mat-icon-button color="primary"
+                                    (click)="onImageDisplay(data, element.images, element.modalWidth)"
+                                    *ngIf="getImageCount(data, element.images.imageItems)">
+                                    <mat-icon matTooltip="View">image</mat-icon>
+                                </button>
+                                <span *ngIf="!getImageCount(data, element.images.imageItems)">-</span>
+                                <label>{{getImageCount(data, element.images.imageItems)>1?'-'+getImageCount(data, element.images.imageItems): ""}}</label>
+                            </ng-container>
+                            <ng-container *ngIf="element.images.showAll">
+                                <ng-container *ngIf="getImageCount(data, element.images.imageItems)">
+                                    <div fxLayout="row" fxLayoutGap="2%" class="inline-images">
+                                        <ng-container
+                                            *ngFor="let each of getImages(data, element.images.imageItems); trackBy: trackByIndex; let i = index;">
+                                            <img [src]="each.image.src" [alt]="each.image.alt"
+                                                (click)="onImageDisplay(data, element.images, element.modalWidth, i)">
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                                <span *ngIf="!getImageCount(data, element.images.imageItems)">-</span>
+                            </ng-container>
+                        </span>
+                        <!-- ========== IMAGE TYPE VALUE END ========== -->
+
+                        <!-- ========== DOCUMENT TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'document'">
+                            <ng-container *ngIf="!element.documents.showAll">
+                                <button mat-icon-button color="primary"
+                                    (click)="onDocumentDisplay(data, element.documents, element.modalWidth)"
+                                    *ngIf="getDocumentCount(data, element.documents.documentItems)">
+                                    <mat-icon matTooltip="View Documents">description</mat-icon>
+                                </button>
+                                <span *ngIf="!getDocumentCount(data, element.documents.documentItems)">-</span>
+                                <label>{{getDocumentCount(data, element.documents.documentItems)>1?'-'+getDocumentCount(data, element.documents.documentItems): ""}}</label>
+                            </ng-container>
+                            <ng-container *ngIf="element.documents.showAll">
+                                <ng-container *ngIf="getDocumentCount(data, element.documents.documentItems)">
+                                    <ng-container
+                                        *ngFor="let each of getDocuments(data, element.documents.documentItems); trackBy: trackByIndex; let i = index;">
+                                        <button mat-icon-button color="primary">
+                                            <mat-icon matTooltip="View"
+                                                (click)="onDocumentDisplay(data, element.documents, element.modalWidth, i)">
+                                                {{getDocumentIcon(each.document.src)}}</mat-icon>
+                                        </button>
+                                    </ng-container>
+                                </ng-container>
+                                <span *ngIf="!getDocumentCount(data, element.documents.documentItems)">-</span>
+                            </ng-container>
+                        </span>
+                        <!-- ========== DOCUMENT TYPE VALUE END ========== -->
+
+                        <!-- ========== LINK TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'link'">
+                            <!-- Valid Link Value -->
+                            <span *ngIf="
+                                                    getValueWithApiKey(data, element.value) !== '-';
+                                                    else emptyValue
+                                                  ">
+                                <!-- Valid Self URL -->
+                                <span *ngIf="element.link.target === 'self'; else externalUrl">
+                                    <span *ngIf="!isUrl(getValueWithApiKey(data, element.value)); else notValidSelfUrl">
+                                        <a color="primary" [matTooltip]="element.tooltip"
+                                            (click)="onOpenSelfUrl(data, getValueWithApiKey(data, element.value))">
+                                            {{
+                                                          getValueWithApiKey(data, element.value)
+                                                            ? getValueWithApiKey(data, element.value)
+                                                            : "-"
+                                                        }}
+                                        </a>
+                                    </span>
+                                    <!-- Invalid Self URL -->
+                                    <ng-template #notValidSelfUrl>
+                                        <span class="warn">Invalid 'self' url</span>
+                                    </ng-template>
+                                </span>
+
+                                <!-- External URL -->
+                                <ng-template #externalUrl>
+                                    <span *ngIf="element.link.target === 'external'">
+                                        <a color="primary" [matTooltip]="element.tooltip"
+                                            (click)="onOpenExternalUrl(data, getValueWithApiKey(data, element.value))">
+                                            {{
+                                                          getValueWithApiKey(data, element.value)
+                                                            ? getValueWithApiKey(data, element.value)
+                                                            : "-"
+                                                        }}
+                                        </a>
+                                    </span>
+                                </ng-template>
+                            </span>
+
+                            <!-- Invalid Link Value -->
+                            <ng-template #emptyValue>
+                                <span>-</span>
+                            </ng-template>
+                        </span>
+                        <!-- ========== LINK TYPE VALUE END ========== -->
+
+                        <!-- ========== ENUM TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'enum'"
+                            [ngStyle]="{'background': displayBackgroundForEnum(getValueWithApiKey(data, element.value), element.enumValues), 'color': displayColorForEnum(getValueWithApiKey(data, element.value), element.enumValues)}">
+                            {{ displayValueForEnum(getValueWithApiKey(data, element.value), element.enumValues) }}
+                        </span>
+                        <!-- ========== ENUM TYPE VALUE END ========== -->
+
+                        <!-- ========== ENUM ICON TYPE VALUE START ========== -->
+                        <span *ngIf="element.type === 'enum_icon'">
+                            <ng-container
+                                *ngIf="displayIconForEnum(getValueWithApiKey(data, element.value), element.enumIcons); else notValidEnumIcon">
+                                <can-icon
+                                    [iconConfig]="displayIconForEnum(getValueWithApiKey(data, element.value), element.enumIcons)">
+                                </can-icon>
+                            </ng-container>
+
+                            <!-- Invalid Enum Icon Value -->
+                            <ng-template #notValidEnumIcon>
+                                <span>-</span>
+                            </ng-template>
+
+                        </span>
+                        <!-- ========== ENUM ICON TYPE VALUE END ========== -->
+
+
+
+                        <!-- ========== GROUPS START ========== -->
+                        <ng-container *ngIf="element.type === 'group'">
+                            <span *ngIf="element.group?.displayedFields?.length; else emptyGroup">
+                                <ng-container
+                                    *ngTemplateOutlet="detailViewTemplate;context:{displayedFieldDefs:element.group.displayedFields, columnPerRow: element.group.columnPerRow, labelPosition: element.group.labelPosition, data: data}">
+                                </ng-container>
+                            </span>
+                            <!-- Empty Group -->
+                            <ng-template #emptyGroup>-</ng-template>
+                        </ng-container>
+                        <!-- ========== GROUPS END ========== -->
+
+                        <!-- ========== API GROUP START ========== -->
+                        <ng-container *ngIf="element.type === 'api_group'">
+                            <span *ngIf="element.apiGroup?.displayedFields?.length; else emptyApiGroup">
+                                <ng-container
+                                    *ngTemplateOutlet="detailViewTemplate;context:{displayedFieldDefs:element.apiGroup.displayedFields, columnPerRow: columnPerRow, labelPosition: labelPosition, data: element.apiGroup.dataSource}">
+                                </ng-container>
+                            </span>
+                            <!-- Empty Group -->
+                            <ng-template #emptyApiGroup>-</ng-template>
+                        </ng-container>
+                        <!-- ========== API GROUP END ========== -->
+
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </ng-template>
+    <!-- Displaying Value -->
+
+</div>

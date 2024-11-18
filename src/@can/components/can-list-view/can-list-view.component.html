@@ -1,0 +1,302 @@
+<div
+  class="main-list-container"
+  *ngIf="listViewConfig"
+  [ngClass]="[
+    listViewConfig.elevation === undefined
+      ? 'mat-elevation-z3'
+      : 'mat-elevation-z' + listViewConfig.elevation
+  ]"
+>
+  <!-- Loader -->
+  <can-loader *ngIf="isLoad"></can-loader>
+
+  <!-- Header -->
+  <div class="header-container">
+    <!-- Header Name -->
+    <div class="heading" *ngIf="header">
+      <h2>{{ header }}</h2>
+    </div>
+    <!-- Header Name -->
+    <!-- Header action-->
+    <div class="float-btn">
+      <ng-container>
+        <ng-container *ngFor="let fieldActionDef of headerActionDefs">
+          <ng-container>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="applyFieldAction(data, fieldActionDef)"
+              class="action-button"
+            >
+              <can-icon [iconConfig]="fieldActionDef.icon"></can-icon>
+            </button>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      <!-- </mat-menu> -->
+    </div>
+    <!-- Header action-->
+  </div>
+  <!-- Header -->
+
+  <!-- Table Bulk Field Action -->
+  <mat-form-field *ngIf="bulkFieldActionDefs && bulkFieldActionDefs.length">
+    <mat-label>Action</mat-label>
+    <mat-select>
+      <ng-container *ngFor="let bulkFieldAction of bulkFieldActionDefs">
+        <mat-option
+          [value]="a"
+          (keydown)="$event.stopPropagation()"
+          (click)="applyBulkFieldAction(bulkFieldAction)"
+          *canValidatePermission="bulkFieldAction.permission"
+        >
+          {{ bulkFieldAction.label }}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- List container -->
+  <div class="list-container" *ngIf="dataSource && dataSource.length">
+    <div>
+
+            <div style="margin: 20px;">
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox>
+                    <ng-container *ngIf="bulkFieldActionDefs && bulkFieldActionDefs.length" matColumnDef="bulkaction" sticky>
+                        <div mat-header-cell *matHeaderCellDef
+                          [ngClass]="{'left-align': listViewConfig.alignment === 'left', 'right-align': listViewConfig.alignment === 'right', 'center-align': listViewConfig.alignment === 'center'}">
+                          <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox>
+                        </div>
+                        <div mat-cell *matCellDef="let element; let i = index" class="sentenceCase">
+                          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(element) : null"
+                            [checked]="selection.isSelected(element)"></mat-checkbox>
+                        </div>
+
+                      </ng-container>
+            </div>
+            <mat-divider></mat-divider>
+        </div>
+
+    <div *ngFor="let data of dataSource">
+      <div
+        fxlayout="row"
+        fxlayoutalign="start center"
+        style="margin: 10px;"
+        class="flex-layout-bx"
+      >
+        <ng-container
+          *ngIf="bulkFieldActionDefs && bulkFieldActionDefs.length"
+          matColumnDef="bulkaction"
+          sticky
+        >
+          <div
+            mat-header-cell
+            *matHeaderCellDef
+            [ngClass]="{
+              'left-align': listViewConfig.alignment === 'left',
+              'right-align': listViewConfig.alignment === 'right',
+              'center-align': listViewConfig.alignment === 'center'
+            }"
+          >
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            ></mat-checkbox>
+          </div>
+          <div
+            mat-cell
+            *matCellDef="let element; let i = index"
+            class="sentenceCase"
+          >
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(element) : null"
+              [checked]="selection.isSelected(element)"
+            ></mat-checkbox>
+          </div>
+        </ng-container>
+        <mat-checkbox
+          (click)="$event.stopPropagation()"
+          (change)="$event ? selection.toggle(data) : null"
+          [checked]="selection.isSelected(data)"
+        >
+        </mat-checkbox>
+        <div style="margin: auto; padding: 10px;">
+          <div mat-card-avatar>
+            <img
+              [src]="listViewConfig.avatarImage.imageUrl"
+              [alt]="
+                listViewConfig.avatarImage.imageUrl
+                  ? listViewConfig.avatarImage.imageUrl
+                  : ''
+              "
+              class="avatar-image"
+              [ngStyle]="{ 'border-radius': imageRadius }"
+            />
+          </div>
+        </div>
+
+        <div class="list-content" fxFlex="80%">
+          <!-- Title -->
+          <div
+            *ngIf="getValueWithSuffixAndPrefix(listViewConfig.mainText, data)"
+          >
+            <h3 class="list-heading">
+              {{ getValueWithSuffixAndPrefix(listViewConfig.mainText, data) }}
+            </h3>
+          </div>
+          <!-- sub-title 1st -->
+          <div
+            class="list-para"
+            *ngIf="getValueWithSuffixAndPrefix(listViewConfig.subText, data)"
+          >
+            {{ getValueWithSuffixAndPrefix(listViewConfig.subText, data) }}
+          </div>
+          <!-- subTitle 2nd -->
+          <div
+            class="list-date"
+            *ngIf="getValueWithSuffixAndPrefix(listViewConfig.body, data)"
+          >
+            {{ getValueWithSuffixAndPrefix(listViewConfig.body, data) }}
+          </div>
+        </div>
+        <div
+          class="actions"
+          fxFlex="20%"
+          *ngIf="fieldActionDefs && fieldActionDefs.length"
+        >
+          <ng-container *ngIf="isSmallScreen">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              aria-label="icon-button with a menu"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <ng-container *ngFor="let fieldActionDef of fieldActionDefs">
+                <ng-container
+                  *canValidatePermission="fieldActionDef.action.permission"
+                >
+                  <button
+                    mat-menu-item
+                    *ngIf="
+                      actionDisplayValidate(
+                        fieldActionDef.action.displayCondition,
+                        data
+                      )
+                    "
+                    (click)="applyFieldAction(data, fieldActionDef)"
+                  >
+                    <can-icon [iconConfig]="fieldActionDef.icon"></can-icon>
+                    <span>{{ fieldActionDef.icon.tooltip }}ass</span>
+                  </button>
+                </ng-container>
+              </ng-container>
+            </mat-menu>
+          </ng-container>
+
+          <div
+            *ngIf="!isSmallScreen"
+            class="icon-flexbox"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            fxLayoutGap="4px"
+          >
+            <span
+              class="eye-icon"
+              *ngFor="let fieldActionDef of fieldActionDefs"
+            >
+              <span *canValidatePermission="fieldActionDef.action.permission">
+                <span
+                  *ngIf="
+                    actionDisplayValidate(
+                      fieldActionDef.action.displayCondition,
+                      data
+                    )
+                  "
+                  class="field-action-icon"
+                >
+                  <can-icon
+                    [iconConfig]="fieldActionDef.icon"
+                    (click)="
+                      applyFieldAction(data, fieldActionDef, actionSpinner)
+                    "
+                    *ngIf="checkForActionVisiblity(actionSpinner)"
+                  ></can-icon>
+                  <mat-spinner [diameter]="18" #actionSpinner></mat-spinner>
+                </span>
+              </span>
+            </span>
+          </div>
+
+          <div></div>
+        </div>
+      </div>
+      <!-- Divider -->
+      <mat-divider></mat-divider>
+      <!-- Divider -->
+    </div>
+    <div class="button-bx">
+      <ng-container>
+        <ng-container *ngFor="let fieldActionDef of footerActionDefs">
+          <ng-container>
+            <can-button
+              [buttonConfig]="fieldActionDef"
+              (onClick)="applyFieldAction(data, fieldActionDef)"
+            ></can-button>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <!-- List container -->
+
+  <!-- footer-Button -->
+</div>
+
+<!--New Html-->
+
+<!-- <div class="border-bx">
+    <h2>Title</h2>
+    <div class="flex-container flex-container-wrap scroll-y">
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+        <div class="text-container">
+            <h3>45521</h3>
+            <p>Lorem Ipsum</p>
+        </div>
+
+    </div>
+</div> -->

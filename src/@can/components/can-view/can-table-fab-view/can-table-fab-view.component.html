@@ -1,0 +1,13 @@
+<h1 *ngIf="header">{{header}}</h1>
+
+<!-- Display Any Component / HTML from Parent Component -->
+<can-table [tableConfig]="tableConfig" *ngIf="tableConfig && displayTable" (getData)="onTableData($event)"
+    (getFieldActionData)="onFieldActionData($event)"></can-table>
+<ng-container *ngIf="tableConfig.pagination">
+    <br />
+    <br />
+    <br />
+    <br />
+</ng-container>
+<can-fab-button *ngIf="fabButtonConfig" [fabButtonConfig]="fabButtonConfig"
+    (fabButtonOutputEvent)="reloadContent($event)"></can-fab-button>

@@ -1,0 +1,130 @@
+<div class="sidenav-wrap side-nav" [class.sidenav-is-mobile]="isSmallScreen">
+  <mat-toolbar color="primary" class="sidenav-toolbar">
+    <!-- Menu Button -->
+    <button mat-icon-button (click)="snav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <!-- Menu Button -->
+
+    <!-- Logo -->
+    <h1 class="app-name" *ngIf="navConfig.navTitleType === 'text'">
+      {{ navConfig.navTitle }}
+    </h1>
+    <div class="app-name" *ngIf="navConfig.navTitleType === 'img'">
+      <img [src]="navConfig.navSrc" alt="logo" class="header-logo" />
+    </div>
+    <!-- Logo -->
+
+    <!-- Full Screen -->
+    <button
+      mat-icon-button
+      (click)="fullscreen()"
+      *ngIf="navConfig.fullScreenMode && !isFullScreen()"
+    >
+      <can-icon [iconConfig]="navConfig.fullScreenMode.icon"></can-icon>
+    </button>
+    <button
+      mat-icon-button
+      (click)="exitFullScreen()"
+      *ngIf="navConfig.fullScreenMode && isFullScreen()"
+    >
+      <can-icon [iconConfig]="navConfig.fullScreenMode.exitIcon"></can-icon>
+    </button>
+    <!-- Full Screen -->
+  </mat-toolbar>
+
+  <mat-sidenav-container
+    class="sidenav-container"
+    [style.marginTop.px]="isSmallScreen ? 44 : 0"
+  >
+    <mat-sidenav
+      #snav
+      [mode]="isSmallScreen ? 'over' : 'side'"
+      [fixedInViewport]="isSmallScreen"
+      fixedTopGap="44"
+      [opened]="!isSmallScreen"
+      [autoFocus]="false"
+    >
+      <mat-nav-list>
+        <!-- All Menus -->
+        <!-- Template Reference -->
+        <ng-container
+          *ngTemplateOutlet="navTemplate; context: { navigations: navigations }"
+        >
+        </ng-container>
+        <!-- Template Reference -->
+
+        <ng-template #navTemplate let-navigations="navigations">
+          <!-- Hover Effect Hack For Nested Menu Removed mouseenter event-->
+          <!-- <div *ngFor="let nav of navigations" (mouseenter)="nav.expanded = true"> -->
+          <div *ngFor="let nav of navigations">
+            <ng-container>
+              <!-- Single -->
+              <div *canValidatePermission="nav.permission">
+                <mat-list-item
+                  *ngIf="nav.type === 'single'"
+                  (click)="closeSideNav()"
+                  [routerLink]="nav.url"
+                  routerLinkActive="active-list-item"
+                >
+                  <a matLine>{{ nav.name }}</a>
+                  <can-icon matListIcon [iconConfig]="nav.icon"></can-icon>
+                  <span [matBadge]="nav.badge" matBadgeOverlap="false"></span>
+                </mat-list-item>
+              </div>
+              <!-- Single -->
+
+              <!-- Group -->
+              <div *canValidatePermission="nav.permission">
+                <mat-list-item
+                  *ngIf="nav.type === 'group'"
+                  (click)="changeGroupState(nav)"
+                >
+                  <a matLine>{{ nav.name }}</a>
+                  <can-icon matListIcon [iconConfig]="nav.icon"></can-icon>
+                  <span [matBadge]="nav.badge" matBadgeOverlap="false"></span>
+                  <mat-icon
+                    [@indicatorRotate]="nav.expanded ? 'expanded' : 'collapsed'"
+                  >
+                    expand_more
+                  </mat-icon>
+                </mat-list-item>
+              </div>
+              <!-- Group -->
+
+              <!-- Nested Elements -->
+              <div
+                *ngIf="nav.type === 'group' && nav.expanded"
+                style="padding-left: 20px"
+              >
+                <!-- Template Reference -->
+                <ng-container
+                  *ngTemplateOutlet="
+                    navTemplate;
+                    context: { navigations: nav.group }
+                  "
+                >
+                </ng-container>
+                <!-- Template Reference -->
+              </div>
+              <!-- Nested Elements -->
+            </ng-container>
+          </div>
+        </ng-template>
+
+        <!-- Logout -->
+        <div>
+          <mat-list-item (click)="onLogout()">
+            <a matLine>Logout</a>
+            <i matListIcon class="flaticon-logout flat-icon-custom"></i>
+          </mat-list-item>
+        </div>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <!-- Main Page Content Display -->
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

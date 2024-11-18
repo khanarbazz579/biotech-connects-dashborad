@@ -1,0 +1,163 @@
+.main-list-container {
+  padding: 10px;
+  overflow-wrap: break-word;
+
+  .list-container {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+    overflow: hidden;
+
+    .list-content {
+      margin: auto;
+    }
+
+    .actions {
+      margin: auto;
+      text-align: center;
+
+      mat-spinner {
+        display: none;
+      }
+    }
+  }
+}
+
+.round-image {
+  border-radius: 30%;
+}
+
+.action-button {
+  border: none;
+}
+
+.float-btn {
+  float: right;
+}
+::ng-deep {
+  .mat-menu-item {
+    .flat-icon-custom:before {
+      margin-right: 16px;
+      vertical-align: sub;
+      padding: 0;
+      margin: 0;
+    }
+  }
+}
+
+.avatar-image {
+  width: 60px;
+  height: 60px;
+  margin-right: 20px;
+  border-radius: 50%;
+  border: 1px solid #eee;
+  -webkit-box-shadow: -2px 10px 22px -8px rgba(0, 0, 0, 0.17);
+  -moz-box-shadow: -2px 10px 22px -8px rgba(0, 0, 0, 0.17);
+  box-shadow: -2px 10px 22px -8px rgba(0, 0, 0, 0.17);
+}
+.mat-checkbox {
+  margin-right: 20px;
+  margin-left: 10px;
+}
+
+.flex-layout-bx {
+  align-items: center;
+  display: flex;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.list-heading {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: #333333;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 500;
+  line-height: 22px;
+}
+.list-para {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: rgba(0, 0, 0, 0.87);
+  margin-bottom: 5px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  line-height: 22px;
+}
+.list-date {
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: #808080;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  line-height: 22px;
+  // text-transform: uppercase;
+}
+
+.icon-flexbox {
+  justify-content: flex-end !important;
+  padding-right: 8px;
+}
+.icon-flexbox .eye-icon .mat-icon-custom {
+  padding: 4px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+.button-bx {
+  margin: 20px;
+  overflow: hidden;
+}
+
+.float-btn button {
+  margin: 0;
+  padding: 0;
+  min-width: 30px;
+  margin-right: 15px;
+}
+
+/*New HTML CSS*/
+
+// .border-bx{
+//     border:4px solid #ccc;
+//     padding: 10px;
+
+// }
+// .border-bx-scroll{
+//    overflow-x: auto;
+// }
+// .scroll-y {
+//     overflow-y: auto;
+//     max-height: 300px;
+// }
+// .flex-container{
+//     display: flex;
+//     justify-content: flex-start;
+//     align-items: center;
+//     flex-wrap: nowrap;
+//     flex-flow: row;
+// }
+// .flex-container-wrap{
+//     flex-wrap: wrap;
+// }
+// .text-container{
+//     background-color: #00BFFF;
+//     padding: 20px 10px;
+//     border-radius: 10px;
+//     -webkit-box-shadow: 9px 2px 24px -13px rgba(0,0,0,0.41);
+//     -moz-box-shadow: 9px 2px 24px -13px rgba(0,0,0,0.41);
+//     box-shadow: 9px 2px 24px -13px rgba(0,0,0,0.41);
+//     min-width: 200px;
+//     text-align: center;
+//     font-family: Roboto,"Helvetica Neue",sans-serif;
+//     margin: 20px 20px 20px 0;
+// }
+
+// .text-container h3{
+//     font-size: 42px;
+//     color: #fff;
+//     margin: 0;
+//     letter-spacing: 2px;
+// }
+// .text-container p{
+//     font-size: 18px;
+//     color: #fff;
+//     margin: 0;
+// }

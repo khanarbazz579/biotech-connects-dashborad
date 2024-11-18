@@ -1,0 +1,9 @@
+<div *ngIf="footer.buttons && footer.buttons.length" class="footer-container">
+    <ng-container *ngFor="let button of footer.buttons">
+        <ng-container *canValidatePermission="button.permission">
+            <button mat-raised-button color="primary"
+                [ngClass]="{'right-position': button.position === 'right', 'left-position': button.position === 'left'}"
+                (click)="applyAction(button)">{{button.text}}</button>
+        </ng-container>
+    </ng-container>
+</div>
