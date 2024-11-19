@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  // baseUrl: "https://biotech-connects-api.onrender.com/v1",
+  baseUrl: "https://biotech-connects-api.onrender.com/v1",
   tokenKey: "authorization",
-  baseUrl: "http://localhost:4000/v1",
+  // baseUrl: "http://localhost:4000/v1",
   razorpayUrl: 'https://razorpay.com'
 };
 
