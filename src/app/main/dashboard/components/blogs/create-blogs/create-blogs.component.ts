@@ -59,9 +59,9 @@ export class CreateBlogsComponent implements OnInit {
         }, 
 
         {
-          name: 'body',
+          name: 'content',
           type: 'array',
-          placeholder: 'Blog',
+          placeholder: 'Blog Content',
           formArray: {
             addButton: {
               type: 'raised',
@@ -78,12 +78,12 @@ export class CreateBlogsComponent implements OnInit {
             {
               name: 'title',
               type: 'text',
-              placeholder: 'SubTitle'
+              placeholder: 'Sub Title'
             },
             {
               name: 'description',
               type: 'textarea',
-              placeholder: 'paragraph'
+              placeholder: 'Content'
             }, 
             {
               name: 'images',
