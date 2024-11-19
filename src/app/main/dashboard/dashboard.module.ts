@@ -6,7 +6,6 @@ import { DashboardRouteModule } from "./dashboard.route";
 import { RouterModule } from "@angular/router";
 import { WelcomeComponent } from "./components/welcome/welcome.component";
 
-import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { InternalsComponent } from "./components/internals/internals.component";
 import { AddUserRoleComponent } from "./components/add-user-role/add-user-role.component";
 import { RolesComponent } from "./components/roles/roles.component";
@@ -58,7 +57,7 @@ import { EditBlogsComponent } from './components/blogs/edit-blogs/edit-blogs.com
     CreateBlogsComponent,
     EditBlogsComponent,
   ],
-  imports: [CanSharedModule, RouterModule, NgxChartsModule],
+  imports: [CanSharedModule, RouterModule],
   exports: [
     // Routes
     DashboardRouteModule,
