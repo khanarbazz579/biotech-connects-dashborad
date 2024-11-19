@@ -218,7 +218,23 @@ export class BlogsComponent implements OnInit {
         },
       ],
       filters: [
-      
+        {
+          filtertype: "api",
+          placeholder: "Search Title/Description",
+          type: "text",
+          key: "id",
+          searchType: "autocomplete",
+          autoComplete: {
+            type: "api",
+            apiValueKey: "id",
+            apiViewValueKey: "name",
+            autocompleteParamKeys: ["title", "description"],
+            api: {
+              apiPath: "/blogs",
+              method: "GET",
+            },
+          },
+        }
       ],
       api: {
         apiPath: "/blogs",
