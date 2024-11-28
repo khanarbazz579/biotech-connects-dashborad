@@ -142,7 +142,7 @@ export class AddUserComponent implements OnInit {
     }
     this.apiService.request(userPost,event)
       .subscribe((res:any) => {
-       this.mapRole(event,res.data);
+       this.mapRole(event,res);
       })
   }
 
@@ -166,12 +166,12 @@ export class AddUserComponent implements OnInit {
 
   FormSubmitResponse(event) {
     // If Manpower not found then open add manpower component
-  console.log(event.data.id)
+  console.log(event.id)
     if (!event.submitResponse) {
       this.notificationService.showSuccess("User created successfully!");
       const dialogRef = this.dialog.open(MapUserRoleComponent, {
         width: "600px",
-        data: { userId: event.data.id }
+        data: { userId: event.id }
       });
       dialogRef.afterClosed().subscribe(submitResponse => {
       });
