@@ -30,12 +30,16 @@ export class EditRolesComponent implements OnInit {
             errorMessage: 'Name is required.'
           }
         },
+    
         {
-          name: 'isActive',
-          type: 'toggle',
-          value: 'isActive',
-          defaultValue : true,
+          name: 'status',
+          type: 'select',
           placeholder: 'Is Active',
+          value:'status',
+          values: [
+            { value: 'active', viewValue: 'active' },
+            { value: 'inactive', viewValue: 'inactive' },
+          ]
         },
 
       ],

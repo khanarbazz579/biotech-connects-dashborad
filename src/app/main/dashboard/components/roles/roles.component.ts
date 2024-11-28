@@ -31,7 +31,7 @@ export class RolesComponent implements OnInit {
           {
             header: 'Is Active',
             type: 'enum_icon',
-            value: 'isActive',
+            value: 'status',
             enumIcons: [
             
               {

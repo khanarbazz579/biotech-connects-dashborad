@@ -43,11 +43,11 @@ export class UsersComponent implements OnInit {
         {
           header: 'Is Active',
           type: 'enum_icon',
-          value: 'isActive',
+          value: 'status',
           enumIcons: [
           
             {
-              value: true,
+              value: 'active',
               icon: {
                 type: CanIconType.Material,
                 name: "fiber_manual_record",
@@ -56,7 +56,7 @@ export class UsersComponent implements OnInit {
               },
             },
             {
-              value: false,
+              value: 'inactive',
               icon: {
                 type: CanIconType.Material,
                 name: "fiber_manual_record",

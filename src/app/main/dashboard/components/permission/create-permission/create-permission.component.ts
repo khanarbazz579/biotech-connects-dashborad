@@ -32,9 +32,12 @@ export class CreatePermissionComponent implements OnInit {
         },
         {
           name: 'status',
-          type: 'hidden',
+          type: 'select',
           placeholder: 'Is Active',
-          defaultValue:'active'
+          values: [
+            { value: 'active', viewValue: 'active' },
+            { value: 'inactive', viewValue: 'inactive' },
+          ]
         }
       ],
       submitApi: {

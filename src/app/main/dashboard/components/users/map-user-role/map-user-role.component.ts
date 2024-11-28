@@ -48,16 +48,16 @@ export class MapUserRoleComponent implements OnInit {
             api: {
               apiPath: '/roles',
               method: 'GET',
-              params: new HttpParams()
-              .append(
-                "and",
-                JSON.stringify([
-                  { name: {'ne': 'customer'} },
-                  { name: {'ne': 'Customer'} }
-                ])
-              ),
+              // params: new HttpParams()
+              // .append(
+              //   "and",
+              //   JSON.stringify([
+              //     { name: {'ne': 'customer'} },
+              //     { name: {'ne': 'Customer'} }
+              //   ])
+              // ),
             },
-            apiDataKey:'data',
+            // apiDataKey:'data',
             apiValueKey: "id",
             apiViewValueKey: "name",
           },

@@ -44,10 +44,23 @@ export class AddUserComponent implements OnInit {
           },
   
         },
-       
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Password',
+          required: {
+            value: true,
+            errorMessage: 'Password is required!'
+          },
+          pattern: {
+            value: "^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$",
+            errorMessage: 'Password must be in proper case.'
+          },
+  
+        },
         {
           name: 'mobile',
-          type: 'number',
+          type: 'text',
           placeholder: 'Mobile Number',
           required: {
             value: true,
@@ -70,19 +83,21 @@ export class AddUserComponent implements OnInit {
         },
 
         {
-          name: 'isActive',
-          type: 'toggle',
+          name: 'status',
+          type: 'select',
           placeholder: 'Is Active',
-          value:'isActive',
-          defaultValue : true,
-          
+          value:'status',
+          values: [
+            { value: 'active', viewValue: 'active' },
+            { value: 'inactive', viewValue: 'inactive' },
+          ]
         },
-        {
-          name :'type',
-          type:'hidden',
-          placeholder:null,
-          defaultValue:'internal'
-        },
+        // {
+        //   name :'type',
+        //   type:'hidden',
+        //   placeholder:null,
+        //   defaultValue:'internal'
+        // },
         {
           name: 'roleId',
           type: 'select',
@@ -95,7 +110,7 @@ export class AddUserComponent implements OnInit {
               apiPath: '/roles',
               method: 'GET'
             },
-            apiDataKey:'data',
+            // apiDataKey:'data',
             apiValueKey: "id",
             apiViewValueKey: "name",
           },

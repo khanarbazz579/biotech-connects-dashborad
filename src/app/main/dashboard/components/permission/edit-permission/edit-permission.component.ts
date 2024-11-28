@@ -31,11 +31,15 @@ export class EditPermissionComponent implements OnInit {
           }
         },
         {
-          name: 'isActive',
-          type: 'toggle',
+          name: 'status',
+          type: 'select',
           placeholder: 'Is Active',
-          value:'isActive'
-        }
+          value:'status',
+          values: [
+            { value: 'active', viewValue: 'active' },
+            { value: 'inactive', viewValue: 'inactive' },
+          ]
+        },
       ],
       getApi:{
         apiPath: `/permissions/${this.roleId}`,

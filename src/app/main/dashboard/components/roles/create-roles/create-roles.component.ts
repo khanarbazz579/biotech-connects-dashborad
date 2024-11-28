@@ -28,12 +28,15 @@ export class CreateRolesComponent implements OnInit {
             errorMessage: 'Name is required.'
           }
         },
+     
         {
-          name: 'isActive',
-          type: 'toggle',
-          value: 'isActive',
-          defaultValue : true,
+          name: 'status',
+          type: 'select',
           placeholder: 'Is Active',
+          values: [
+            { value: 'active', viewValue: 'active' },
+            { value: 'inactive', viewValue: 'inactive' },
+          ]
         },
 
       ],
